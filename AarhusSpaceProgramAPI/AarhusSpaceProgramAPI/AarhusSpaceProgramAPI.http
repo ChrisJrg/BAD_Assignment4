@@ -1,0 +1,6 @@
+@AarhusSpaceProgramAPI_HostAddress = http://localhost:5265
+
+GET {{AarhusSpaceProgramAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
