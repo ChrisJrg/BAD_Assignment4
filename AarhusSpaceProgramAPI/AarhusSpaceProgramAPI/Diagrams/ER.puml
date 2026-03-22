@@ -1,0 +1,105 @@
+﻿@startchen
+
+entity Manager {
+    Department
+    ManagerId <<key>>
+    Name 
+    HireDate
+}
+
+entity Mission {
+    MissionId <<key>>
+    Name 
+    LaunchDate
+    Duration
+    Status
+    Type
+}
+
+entity Launchpad{
+    LaunchpadId <<key>>
+    Location 
+    CurrentStatus
+    MaxWeight
+}
+
+entity Astronaut{
+    AstronautId <<key>>
+    Name 
+    Rank
+    Paygrade
+    HireDate
+    ExpInSpace
+    ExpInSim
+}
+
+entity Scientist {
+    ScientistId <<key>>
+    Name 
+    Title
+    Specialty
+    HireDate
+}
+
+entity Rocket{
+    RocketId <<key>>
+    Model 
+    PayloadCap
+    CrewCap
+    Stages
+    FuelCap
+    Weight
+}
+
+entity Celestial_body{
+    bodyId <<key>>
+    Name
+    Distance
+    Composition
+    bodyType
+}
+
+
+relationship Launch_from{
+}
+relationship Has{
+}
+relationship Assigned{
+}
+relationship Assigned_to{
+}
+relationship Participate{
+}
+relationship Target{
+}
+
+
+
+Mission -1- Launch_from
+Launch_from -N- Launchpad
+
+Manager -1- Has
+Has -N- Mission
+
+Astronaut -(1,N)- Assigned
+Assigned -N- Mission
+
+Scientist -N- Participate
+Participate -N- Mission
+
+Rocket -1- Assigned_to
+Assigned_to -1- Mission
+
+Mission -N- Target
+Target -1- Celestial_body
+
+
+
+
+
+
+
+
+
+
+@endchen
