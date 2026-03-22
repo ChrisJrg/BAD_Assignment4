@@ -1,5 +1,4 @@
 ﻿@startchen
-
 entity Manager {
     Department
     ManagerId <<key>>
@@ -72,6 +71,8 @@ relationship Participate{
 }
 relationship Target{
 }
+relationship Orbiting{
+}
 
 
 
@@ -93,7 +94,8 @@ Assigned_to -1- Mission
 Mission -N- Target
 Target -1- Celestial_body
 
-
+Celestial_body -N- Orbiting
+Orbiting -1- Celestial_body
 
 
 
