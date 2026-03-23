@@ -7,4 +7,6 @@ public class Scientist
     public DateTime HireDate { get; set; }
     public string Title {get; set;}
     public string Specialty { get; set; }
+    
+    public ICollection<Mission> Missions { get; set; } =  new List<Mission>();
 }

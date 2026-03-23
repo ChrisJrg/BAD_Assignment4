@@ -6,4 +6,6 @@ public class LaunchPad
     public string Location { get; set; }
     public double MaxWeight { get; set; }
     public string CurrentStatus { get; set; }
+    
+    public ICollection<Mission> Missions { get; set; } = new List<Mission>();
 }

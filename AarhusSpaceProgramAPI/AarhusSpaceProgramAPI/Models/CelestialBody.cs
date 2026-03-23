@@ -11,4 +11,6 @@ public class CelestialBody
 
     public CelestialBody ParentPlanet { get; set; }
     public ICollection<CelestialBody> Moons { get; set; } = new List<CelestialBody>();
+    
+    public ICollection<Mission> Missions { get; set; } = new List<Mission>();
 }

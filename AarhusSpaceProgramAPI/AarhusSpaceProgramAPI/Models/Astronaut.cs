@@ -10,4 +10,6 @@ public class Astronaut
     public double EXPInSim { get; set; }
     public double EXPInSpace { get; set; }
     
+    public ICollection<Mission> Missions { get; set; } = new List<Mission>();
+    
 }
