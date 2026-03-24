@@ -19,9 +19,21 @@ public class AstronautController : ControllerBase
 
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Astronaut>>> GetAstronauts()
+    public async Task<ActionResult<IEnumerable<AstronautDto>>> GetAstronauts()
     {
-        return await _context.Astronauts.ToListAsync();
+        var astronauts = await _context.Astronauts
+            .Select(a => new AstronautDto
+            {
+                AstronautId =  a.AstronautId,
+                Name = a.Name,
+                HireDate = a.HireDate,
+                PayGrade = a.PayGrade,
+                Rank = a.Rank,
+                EXPInSim = a.EXPInSim,
+                EXPInSpace = a.EXPInSpace,
+            }).ToListAsync();
+        
+        return Ok(astronauts);
     }
 
     [HttpPost]
@@ -68,6 +80,7 @@ public class AstronautController : ControllerBase
         astronaut.Rank = dto.Rank;
         astronaut.EXPInSim = dto.EXPInSim;
         astronaut.EXPInSpace = dto.EXPInSpace;
+        
         _context.Entry(astronaut).State = EntityState.Modified;
         await _context.SaveChangesAsync();
         return NoContent();
