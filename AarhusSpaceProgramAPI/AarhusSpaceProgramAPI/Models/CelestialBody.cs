@@ -10,7 +10,7 @@ public class CelestialBody
 
     public CelestialBody ParentPlanet { get; set; }
     public ICollection<CelestialBody> Moons { get; set; } = new List<CelestialBody>();
-    public int ParentPlanetId { get; set; }
+    public int? ParentPlanetId { get; set; }
     
     
     public ICollection<Mission> Missions { get; set; } = new List<Mission>();

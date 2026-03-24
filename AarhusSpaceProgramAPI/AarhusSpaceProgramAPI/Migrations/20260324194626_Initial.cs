@@ -41,7 +41,7 @@ namespace AarhusSpaceProgramAPI.Migrations
                     BodyType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ParentPlanetId = table.Column<int>(type: "int", nullable: false)
                 },
-                constraints: table =>
+                constraints: table => 
                 {
                     table.PrimaryKey("PK_CelestialBodies", x => x.CelestialBodyId);
                     table.ForeignKey(
