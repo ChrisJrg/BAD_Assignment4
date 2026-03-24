@@ -19,9 +19,6 @@ public class MissionDto
     public LaunchPad LaunchPad { get; set; }
     public Manager Manager { get; set; }
     public CelestialBody TargetBody { get; set; }
-
-    
-    
     
     public ICollection<Astronaut>  Astronauts { get; set; } = new List<Astronaut>();
     public ICollection<Scientist> Scientists { get; set; } = new List<Scientist>();

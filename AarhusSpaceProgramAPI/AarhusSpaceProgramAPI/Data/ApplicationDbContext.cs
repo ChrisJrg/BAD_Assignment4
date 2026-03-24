@@ -46,8 +46,6 @@ public class ApplicationDbContext :  DbContext
             .WithMany(c => c.Moons)
             .HasForeignKey(c => c.ParentPlanetId)
             .OnDelete(DeleteBehavior.Restrict);
-        
-
     }
     
     public DbSet<Astronaut> Astronauts { get; set; }

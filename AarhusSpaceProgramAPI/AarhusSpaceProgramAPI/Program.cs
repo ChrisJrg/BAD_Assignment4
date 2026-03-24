@@ -55,7 +55,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference(options =>
     {
-        options.OpenApiRoutePattern = "/swagger/v1/swagger.json";
+        options.OpenApiRoutePattern = "/openapi/v1.json";
     });
 }
 
