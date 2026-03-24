@@ -4,9 +4,22 @@ namespace AarhusSpaceProgramAPI.Data;
 
 public class ApplicationDbContext :  DbContext
 {
+    public ApplicationDbContext(){}
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
         
+    }
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    {
+        if (options.IsConfigured) return;
+
+        var configuration = new ConfigurationBuilder()
+            .AddUserSecrets<ApplicationDbContext>()
+            .Build();
+
+        string? connectionString = configuration["ConnectionStrings:DefaultConnection"];
+        options.UseSqlServer(connectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
