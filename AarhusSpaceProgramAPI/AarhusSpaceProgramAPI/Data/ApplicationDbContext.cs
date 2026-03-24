@@ -41,6 +41,12 @@ public class ApplicationDbContext :  DbContext
             .HasMany(s =>  s.Missions)
             .WithMany(m => m.Scientists);
         
+        modelBuilder.Entity<CelestialBody>()
+            .HasOne(c => c.ParentPlanet)
+            .WithMany(c => c.Moons)
+            .HasForeignKey(c => c.ParentPlanetId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
 
     }
     
