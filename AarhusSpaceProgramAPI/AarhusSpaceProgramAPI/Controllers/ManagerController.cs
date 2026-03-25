@@ -34,7 +34,7 @@ public class ManagerController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ManagerDto>> CreateManager(ManagerDto dto)
+    public async Task<ActionResult<ManagerDto>> CreateManager([FromForm] ManagerDto dto)
     {
         var manager = new Manager
         {
@@ -58,7 +58,7 @@ public class ManagerController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateManager(int id, ManagerDto dto)
+    public async Task<IActionResult> UpdateManager(int id, [FromForm] ManagerDto dto)
     {
         var  manager = await _context.Managers.FindAsync(id);
         if (manager == null)

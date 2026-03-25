@@ -54,7 +54,7 @@ public class AstronautController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<AstronautDto>> CreateAstronaut(AstronautDto dto)
+    public async Task<ActionResult<AstronautDto>> CreateAstronaut([FromForm] AstronautDto dto)
     {
         var astronaut = new Astronaut
         {
@@ -84,7 +84,7 @@ public class AstronautController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAstronaut(int id, AstronautDto dto)
+    public async Task<IActionResult> UpdateAstronaut(int id, [FromForm] AstronautDto dto)
     {
         var  astronaut = await _context.Astronauts.FindAsync(id);
         if (astronaut == null)
