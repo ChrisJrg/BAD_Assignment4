@@ -39,11 +39,10 @@ public class RocketController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<RocketDto>> CreateRocket([FromForm]RocketDto dto)
+    public async Task<ActionResult<RocketDto>> CreateRocket([FromBody]RocketDto dto)
     {
         var rocket = new Rocket
         {
-            RocketId =  dto.RocketId,
             Model = dto.Model,
             Weight = dto.Weight,
             CrewCapacity = dto.CrewCapacity,
@@ -52,12 +51,14 @@ public class RocketController : ControllerBase
             PayloadCapacity =  dto.PayloadCapacity,
         };
         
+            if (rocket.Weight < 0) return Conflict("Weight cannot be negative");
+        
+        
         _context.Rockets.Add(rocket);
         await _context.SaveChangesAsync();
 
         var resultDto = new RocketDto
         {
-            RocketId =  rocket.RocketId,
             Model = rocket.Model,
             Weight = rocket.Weight,
             CrewCapacity = rocket.CrewCapacity,
@@ -78,7 +79,7 @@ public class RocketController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateRocket(int id, [FromForm]RocketDto dto)
+    public async Task<IActionResult> UpdateRocket(int id, [FromBody]RocketDto dto)
     {
         var  rocket = await _context.Rockets.FindAsync(id);
         if (rocket == null)
@@ -92,14 +93,15 @@ public class RocketController : ControllerBase
             });
             return NotFound();
         }
-
-        rocket.RocketId =  dto.RocketId;
         rocket.Model = dto.Model;
         rocket.Weight = dto.Weight;
         rocket.CrewCapacity = dto.CrewCapacity;
         rocket.Stages = dto.Stages;
         rocket.FuelCapacity =  dto.FuelCapacity;
         rocket.PayloadCapacity = dto.PayloadCapacity;
+        
+        if (rocket.Weight < 0) return Conflict("Weight cannot be negative");
+        
         
         _context.Entry(rocket).State = EntityState.Modified;
         await _context.SaveChangesAsync();

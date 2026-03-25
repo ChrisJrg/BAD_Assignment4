@@ -90,7 +90,7 @@ public class AstronautController : ControllerBase
             Timestamp = DateTimeOffset.UtcNow
         });
         
-        return Ok(resultDto);
+        return Ok(resultDto);   
     }
 
     [HttpPut("{id}")]

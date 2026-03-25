@@ -21,7 +21,7 @@ namespace AarhusSpaceProgramAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<MissionDto>> CreateMission([FromForm] MissionDto missionDto)
+        public async Task<ActionResult<MissionDto>> CreateMission([FromBody] MissionDto missionDto)
         {
             var mission = new Mission
             {
@@ -35,6 +35,17 @@ namespace AarhusSpaceProgramAPI.Controllers
                 ManagerId = missionDto.ManagerId,
                 TargetBodyId = missionDto.TargetBodyId
             };
+
+            var missionCheck = _context.Missions
+                .Where(m => m.LaunchDate == mission.LaunchDate)
+                .Where(m => m.LaunchPadId == mission.LaunchPadId)
+                .ToList();
+
+            if (missionCheck.Count != 0)
+            {
+                return Conflict("A launchpad cannot be launched from twice in one day.");
+            }
+            
             if (!Statuses.Contains(mission.Status))
             {
                 throw new ArgumentException();
@@ -357,7 +368,7 @@ namespace AarhusSpaceProgramAPI.Controllers
         }
         
         [HttpPut("UpdateMission/{missionId}")]
-        public async Task<IActionResult> UpdateMission(int missionId, [FromForm] MissionDto missionDto)
+        public async Task<IActionResult> UpdateMission(int missionId, [FromBody] MissionDto missionDto)
         {
             var mission = await _context.Missions.FindAsync(missionId);
             if (mission == null)
