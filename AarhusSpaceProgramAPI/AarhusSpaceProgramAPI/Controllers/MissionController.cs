@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System;
 using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Data;
 using AarhusSpaceProgramAPI.Models;
@@ -10,6 +12,7 @@ namespace AarhusSpaceProgramAPI.Controllers
     public class MissionController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private string[] Statuses = ["Created", "Budgeted", "Approved", "Planned", "Active", "Completed", "Aborted", "Failed"];
         public MissionController(ApplicationDbContext context)
         {
             _context = context;
@@ -26,6 +29,10 @@ namespace AarhusSpaceProgramAPI.Controllers
                 Status = missionDto.Status,
                 Type = missionDto.Type, 
             };
+            if (!Statuses.Contains(mission.Status))
+            {
+                throw new ArgumentException();
+            }
             _context.Missions.Add(mission);
             await _context.SaveChangesAsync();
 
@@ -60,22 +67,88 @@ namespace AarhusSpaceProgramAPI.Controllers
         
             return Ok(mission);
         }
+
+        [HttpDelete("{missionId}")]
+        public async Task<IActionResult> DeleteMission(int missionId)
+        {
+            var mission = await _context.Missions.FindAsync(missionId);
+            if (mission == null)
+            {
+                return NotFound();
+            }
+
+            _context.Missions.Remove(mission);
+            await _context.SaveChangesAsync();
         
+            return NoContent();
+        }
         
-        [HttpPut]
+        [HttpPut("AssignAstronaut/{astronautId}")]
         public async Task<IActionResult> UpdateMissionAssignAstronaut(int missionId, int astronautId)
         {
             var mission = await _context.Missions
                 .Include(i => i.Astronauts)
                 .SingleOrDefaultAsync(m => m.MissionId == missionId);
+            if (mission == null) return Conflict("No mission is assigned this ID");
+            
             
             var astronaut = await _context.Astronauts
                 .SingleOrDefaultAsync(a => a.AstronautId == astronautId);
+            if (astronaut == null) return Conflict("No astronaut is assigned this ID");
+            
             
             mission.Astronauts.Add(astronaut);
             await _context.SaveChangesAsync();
             
             return Ok(mission);
         }
+        
+        [HttpPut("AssignScientist/{scientistId}")]
+        public async Task<IActionResult> UpdateMissionAssignScientist(int missionId, int scientistId)
+        {
+            var mission = await _context.Missions
+                .Include(i => i.Scientists)
+                .SingleOrDefaultAsync(m => m.MissionId == missionId);
+            if (mission == null) return Conflict("No mission is assigned this ID");
+            
+            var scientist = await _context.Scientists
+                .SingleOrDefaultAsync(a => a.ScientistId == scientistId);
+            if (scientist == null) return Conflict("No scientist is assigned this ID");
+            
+            mission.Scientists.Add(scientist);
+            await _context.SaveChangesAsync();
+            
+            return Ok(mission);
+        }
+
+        [HttpPut("StatusUpdate/{missionId}")]
+        public async Task<IActionResult> UpdateMissionStatus(string status, int missionId)
+        {
+            if (string.IsNullOrEmpty(status)) return BadRequest("Status is required");
+            if (!Statuses.Contains(status)) throw new ArgumentException();
+            
+            var mission = await _context.Missions
+                .Include(i => i.Status)
+                .Where(m => m.MissionId == missionId)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(m => m.Status, status));
+            
+            return Ok(mission);
+        }
+        
+        [HttpPut("UpdateMission/{missionId}")]
+        public async Task<IActionResult> UpdateMission(string status, int missionId)
+        {
+            if (string.IsNullOrEmpty(status)) return BadRequest("Status is required");
+            if (!Statuses.Contains(status)) throw new ArgumentException();
+            
+            var mission = await _context.Missions
+                .Include(i => i.Status)
+                .Where(m => m.MissionId == missionId)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(m => m.Status, status));
+            
+            return Ok(mission);
+        }
+        
+        
     }
 }
