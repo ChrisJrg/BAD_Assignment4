@@ -10,5 +10,4 @@ public class Rocket
     public double FuelCapacity { get; set; }
     public double PayloadCapacity { get; set; }
     
-    public ICollection<Mission> Missions { get; set; } = new List<Mission>();
 }
