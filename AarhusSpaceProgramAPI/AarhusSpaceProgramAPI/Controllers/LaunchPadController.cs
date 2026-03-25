@@ -54,7 +54,7 @@ public class LaunchPadController : ControllerBase
             CurrentStatus = launchPad.CurrentStatus,
         };
         
-        return CreatedAtAction(nameof(GetLaunchPads), new { id = launchPad.LaunchPadId}, resultDto);
+        return Ok(resultDto);
     }
 
     [HttpPut("{id}")]

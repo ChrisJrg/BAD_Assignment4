@@ -54,7 +54,7 @@ public class ManagerController : ControllerBase
             HireDate = manager.HireDate,
         };
         
-        return CreatedAtAction(nameof(GetManagers), new { id = manager.ManagerId }, resultDto);
+        return Ok(resultDto);
     }
 
     [HttpPut("{id}")]
