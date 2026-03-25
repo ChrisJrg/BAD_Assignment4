@@ -50,6 +50,9 @@ public class RocketController : ControllerBase
             PayloadCapacity =  dto.PayloadCapacity,
         };
         
+            if (rocket.Weight < 0) return Conflict("Weight cannot be negative");
+        
+        
         _context.Rockets.Add(rocket);
         await _context.SaveChangesAsync();
 
@@ -83,6 +86,10 @@ public class RocketController : ControllerBase
         rocket.Stages = dto.Stages;
         rocket.FuelCapacity =  dto.FuelCapacity;
         rocket.PayloadCapacity = dto.PayloadCapacity;
+        
+        if (rocket.Weight < 0) return Conflict("Weight cannot be negative");
+        
+        
         
         _context.Entry(rocket).State = EntityState.Modified;
         await _context.SaveChangesAsync();
