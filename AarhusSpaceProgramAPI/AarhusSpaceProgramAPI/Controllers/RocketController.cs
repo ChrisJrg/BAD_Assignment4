@@ -8,7 +8,7 @@ namespace AarhusSpaceProgramAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class RockettController : ControllerBase
+public class RocketController : ControllerBase
 {
     private readonly  ApplicationDbContext _context;
 

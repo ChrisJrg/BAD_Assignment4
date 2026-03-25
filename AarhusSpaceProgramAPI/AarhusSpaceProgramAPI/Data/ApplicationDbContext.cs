@@ -27,11 +27,6 @@ public class ApplicationDbContext :  DbContext
         base.OnModelCreating(modelBuilder);
         
         modelBuilder.Entity<Mission>()
-            .HasOne(p => p.Rocket)
-            .WithMany(m => m.Missions)
-            .HasForeignKey(f => f.RocketId);
-
-        modelBuilder.Entity<Mission>()
             .HasOne(p => p.LaunchPad)
             .WithMany(m => m.Missions)
             .HasForeignKey(f => f.LaunchPadId);
