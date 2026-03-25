@@ -10,4 +10,6 @@ public class Rocket
     public double FuelCapacity { get; set; }
     public double PayloadCapacity { get; set; }
     
+    public Mission mission { get; set; }
+    
 }
