@@ -196,7 +196,39 @@ namespace AarhusSpaceProgramAPI.Controllers
             return NoContent();
         }
         
+        [HttpGet("AssignedToMission/{missionId}")]
+        public async Task<IActionResult> AssignedToMissions(int missionId)
+        {
+            var mission = await _context.Missions    
+                .Where(m =>  m.MissionId == missionId)
+                .Select(m => new MissionAstSciDto()
+            {
+                MissionName = m.MissionName,
+                Astronauts =  m.Astronauts,
+                Scientists =  m.Scientists
+            }).ToListAsync();
         
+            return Ok(mission);
+            
+
+        }
+        
+        [HttpGet("MissionsAtTargetBody/{planetId}")]
+        public async Task<IActionResult> MissionsAtTargetBody(int planetId)
+        {
+            var mission = await _context.Missions    
+                .Where(m =>  m.TargetBodyId == planetId)
+                .Select(m => new MissionPlanetDto()
+                {
+                    MissionName = m.MissionName,
+                    TargetBodyId = m.TargetBodyId,
+                    TargetBody = m.TargetBody
+                }).ToListAsync();
+        
+            return Ok(mission);
+            
+
+        }
         
     }
 }
