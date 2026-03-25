@@ -34,7 +34,7 @@ public class ApplicationDbContext :  DbContext
         modelBuilder.Entity<Mission>()
             .HasOne(p => p.LaunchPad)
             .WithMany(m => m.Missions)
-            .HasForeignKey(f => f.LaunchPadId);
+            .HasForeignKey(f => f.LaunchpPadId);
         
         modelBuilder.Entity<Mission>()
             .HasOne(p => p.Manager)
