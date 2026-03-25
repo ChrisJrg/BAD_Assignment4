@@ -69,7 +69,6 @@ public class ManagerController : ControllerBase
         manager.Department = dto.Department;
         manager.HireDate = dto.HireDate;
         
-        _context.Entry(manager).State = EntityState.Modified;
         await _context.SaveChangesAsync();
         return NoContent();
     }

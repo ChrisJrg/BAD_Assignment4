@@ -70,7 +70,6 @@ public class LaunchPadController : ControllerBase
         launchPad.MaxWeight = dto.MaxWeight;
         launchPad.CurrentStatus = dto.CurrentStatus;
         
-        _context.Entry(launchPad).State = EntityState.Modified;
         await _context.SaveChangesAsync();
         return NoContent();
     }

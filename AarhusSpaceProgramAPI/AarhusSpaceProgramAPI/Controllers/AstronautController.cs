@@ -91,6 +91,7 @@ public class AstronautController : ControllerBase
         {
             return NotFound();
         }
+        
         astronaut.Name = dto.Name;  
         astronaut.HireDate = dto.HireDate;
         astronaut.PayGrade = dto.PayGrade;
@@ -98,7 +99,6 @@ public class AstronautController : ControllerBase
         astronaut.EXPInSim = dto.EXPInSim;
         astronaut.EXPInSpace = dto.EXPInSpace;
         
-        _context.Entry(astronaut).State = EntityState.Modified;
         await _context.SaveChangesAsync();
         return NoContent();
     }
