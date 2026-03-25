@@ -9,6 +9,4 @@ public class RocketDto
     public int Stages { get; set; }
     public double FuelCapacity { get; set; }
     public double PayloadCapacity { get; set; }
-    
-    public ICollection<Mission> Missions { get; set; } = new List<Mission>();
 }
