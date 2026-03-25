@@ -19,7 +19,7 @@ namespace AarhusSpaceProgramAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<MissionDto>> CreateMission([FromBody] MissionPostDto missionDto)
+        public async Task<ActionResult<MissionDto>> CreateMission([FromForm] MissionDto missionDto)
         {
             var mission = new Mission
             {
@@ -28,6 +28,10 @@ namespace AarhusSpaceProgramAPI.Controllers
                 Duration = missionDto.Duration,
                 Status = missionDto.Status,
                 Type = missionDto.Type, 
+                RocketId = missionDto.RocketId,
+                LaunchPadId = missionDto.LaunchPadId,
+                ManagerId = missionDto.ManagerId,
+                TargetBodyId = missionDto.TargetBodyId
             };
             if (!Statuses.Contains(mission.Status))
             {
@@ -196,7 +200,7 @@ namespace AarhusSpaceProgramAPI.Controllers
         }
         
         [HttpPut("UpdateMission/{missionId}")]
-        public async Task<IActionResult> UpdateMission(int missionId, MissionDto missionDto)
+        public async Task<IActionResult> UpdateMission(int missionId, [FromForm] MissionDto missionDto)
         {
             var mission = await _context.Missions.FindAsync(missionId);
                 if (mission == null) return NotFound();
@@ -217,7 +221,37 @@ namespace AarhusSpaceProgramAPI.Controllers
             return NoContent();
         }
         
+        [HttpGet("AssignedToMission/{missionId}")]
+        public async Task<IActionResult> AssignedToMissions(int missionId)
+        {
+            var mission = await _context.Missions    
+                .Where(m =>  m.MissionId == missionId)
+                .Select(m => new MissionAstSciDto()
+            {
+                MissionName = m.MissionName,
+                Astronauts =  m.Astronauts,
+                Scientists =  m.Scientists
+            }).ToListAsync();
         
+            return Ok(mission);
+        }
+        
+        [HttpGet("MissionsAtTargetBody/{planetId}")]
+        public async Task<IActionResult> MissionsAtTargetBody(int planetId)
+        {
+            var mission = await _context.Missions    
+                .Where(m =>  m.TargetBodyId == planetId)
+                .Select(m => new MissionPlanetDto()
+                {
+                    MissionName = m.MissionName,
+                    TargetBodyId = m.TargetBodyId,
+                    TargetBody = m.TargetBody
+                }).ToListAsync();
+        
+            return Ok(mission);
+            
+
+        }
         
     }
 }
