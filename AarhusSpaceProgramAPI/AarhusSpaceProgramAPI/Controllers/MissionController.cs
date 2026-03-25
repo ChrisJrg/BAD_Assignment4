@@ -19,6 +19,17 @@ namespace AarhusSpaceProgramAPI.Controllers
             _context = context;
             _logger = logger;
         }
+        
+        private void LogHttpCall(int statusCode)
+        {
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = statusCode,
+                Timestamp = DateTimeOffset.UtcNow
+            });
+        }
 
         [HttpPost]
         public async Task<ActionResult<MissionDto>> CreateMission([FromBody] MissionDto missionDto)
@@ -43,12 +54,16 @@ namespace AarhusSpaceProgramAPI.Controllers
 
             if (missionCheck.Count != 0)
             {
+                LogHttpCall(409);
                 return Conflict("A launchpad cannot be launched from twice in one day.");
             }
             
+            
+            
             if (!Statuses.Contains(mission.Status))
             {
-                throw new ArgumentException();
+                LogHttpCall(409);
+                return Conflict("Status must be in the pre approved list: Created, Budgeted, Approved, Planned, Active Completed, Aborted, Failed");
             }
             _context.Missions.Add(mission);
             await _context.SaveChangesAsync();
@@ -348,7 +363,12 @@ namespace AarhusSpaceProgramAPI.Controllers
                 });
                 return BadRequest("Status is required");
             }
-            if (!Statuses.Contains(status)) throw new ArgumentException();
+
+            if (!Statuses.Contains(status))
+            {
+                LogHttpCall(409);
+                return Conflict("Status must be in the pre approved list: Created, Budgeted, Approved, Planned, Active Completed, Aborted, Failed");
+            } 
             
             var mission = await _context.Missions
                 .Include(i => i.Status)
@@ -392,6 +412,14 @@ namespace AarhusSpaceProgramAPI.Controllers
             mission.LaunchPadId = missionDto.LaunchPadId;
             mission.ManagerId = missionDto.ManagerId;
             mission.TargetBodyId = missionDto.TargetBodyId;
+            
+            
+            if (!Statuses.Contains(mission.Status))
+            {
+                LogHttpCall(409);
+                return Conflict("Status must be in the pre approved list: Created, Budgeted, Approved, Planned, Active Completed, Aborted, Failed");
+            } 
+            
 
             _context.Entry(mission).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -418,7 +446,8 @@ namespace AarhusSpaceProgramAPI.Controllers
                 Astronauts =  m.Astronauts,
                 Scientists =  m.Scientists
             }).ToListAsync();
-        
+
+            LogHttpCall(200);
             return Ok(mission);
         }
         
@@ -433,7 +462,8 @@ namespace AarhusSpaceProgramAPI.Controllers
                     TargetBodyId = m.TargetBodyId,
                     TargetBody = m.TargetBody
                 }).ToListAsync();
-        
+
+            LogHttpCall(200);
             return Ok(mission);
             
 

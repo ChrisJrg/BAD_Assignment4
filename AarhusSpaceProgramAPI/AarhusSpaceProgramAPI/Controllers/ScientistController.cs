@@ -18,6 +18,17 @@ public class ScientistController : ControllerBase
         _context = context;
         _logger = logger;
     }
+    
+    private void LogHttpCall(int statusCode)
+    {
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = statusCode,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+    }
 
 
     [HttpGet]
@@ -32,7 +43,8 @@ public class ScientistController : ControllerBase
                 Title = s.Title,
                 Specialty = s.Specialty,
             }).ToListAsync();
-        
+
+        LogHttpCall(200);
         return Ok(scientists);
     }
 

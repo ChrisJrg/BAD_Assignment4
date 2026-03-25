@@ -18,6 +18,17 @@ public class RocketController : ControllerBase
         _context = context;
         _logger = logger;
     }
+    
+    private void LogHttpCall(int statusCode)
+    {
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = statusCode,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+    }
 
 
     [HttpGet]
@@ -34,7 +45,8 @@ public class RocketController : ControllerBase
                 FuelCapacity =  r.FuelCapacity,
                 PayloadCapacity =  r.PayloadCapacity,
             }).ToListAsync();
-        
+
+        LogHttpCall(200);
         return Ok(rockets);
     }
 
@@ -50,8 +62,12 @@ public class RocketController : ControllerBase
             FuelCapacity =  dto.FuelCapacity,
             PayloadCapacity =  dto.PayloadCapacity,
         };
-        
-            if (rocket.Weight < 0) return Conflict("Weight cannot be negative");
+
+        if (rocket.Weight < 0)
+        {
+            LogHttpCall(409);
+            return Conflict("Weight cannot be negative");
+        }
         
         
         _context.Rockets.Add(rocket);
