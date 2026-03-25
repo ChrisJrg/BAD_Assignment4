@@ -103,6 +103,26 @@ namespace AarhusSpaceProgramAPI.Controllers
             return Ok(mission);
         }
         
+        [HttpPut("RemoveAstronaut/{astronautId}")]
+        public async Task<IActionResult> UpdateMissionRemoveAstronaut(int missionId, int astronautId)
+        {
+            var mission = await _context.Missions
+                .Include(i => i.Astronauts)
+                .SingleOrDefaultAsync(m => m.MissionId == missionId);
+            if (mission == null) return Conflict("No mission is assigned this ID");
+            
+            
+            var astronaut = await _context.Astronauts
+                .SingleOrDefaultAsync(a => a.AstronautId == astronautId);
+            if (astronaut == null) return Conflict("No astronaut is assigned this ID");
+            
+            
+            mission.Astronauts.Remove(astronaut);
+            await _context.SaveChangesAsync();
+            
+            return NoContent();
+        }
+        
         [HttpPut("AssignScientist/{scientistId}")]
         public async Task<IActionResult> UpdateMissionAssignScientist(int missionId, int scientistId)
         {
@@ -118,7 +138,25 @@ namespace AarhusSpaceProgramAPI.Controllers
             mission.Scientists.Add(scientist);
             await _context.SaveChangesAsync();
             
-            return Ok(mission);
+            return NoContent();
+        }
+        
+        [HttpPut("RemoveScientist/{scientistId}")]
+        public async Task<IActionResult> UpdateMissionRemoveScientist(int missionId, int scientistId)
+        {
+            var mission = await _context.Missions
+                .Include(i => i.Scientists)
+                .SingleOrDefaultAsync(m => m.MissionId == missionId);
+            if (mission == null) return Conflict("No mission is assigned this ID");
+            
+            var scientist = await _context.Scientists
+                .SingleOrDefaultAsync(a => a.ScientistId == scientistId);
+            if (scientist == null) return Conflict("No scientist is assigned this ID");
+            
+            mission.Scientists.Remove(scientist);
+            await _context.SaveChangesAsync();
+            
+            return NoContent();
         }
 
         [HttpPut("StatusUpdate/{missionId}")]
@@ -131,23 +169,33 @@ namespace AarhusSpaceProgramAPI.Controllers
                 .Include(i => i.Status)
                 .Where(m => m.MissionId == missionId)
                 .ExecuteUpdateAsync(setters => setters.SetProperty(m => m.Status, status));
-            
+
+            await _context.SaveChangesAsync();
             return Ok(mission);
         }
         
         [HttpPut("UpdateMission/{missionId}")]
-        public async Task<IActionResult> UpdateMission(string status, int missionId)
+        public async Task<IActionResult> UpdateMission(int missionId, MissionDto missionDto)
         {
-            if (string.IsNullOrEmpty(status)) return BadRequest("Status is required");
-            if (!Statuses.Contains(status)) throw new ArgumentException();
-            
-            var mission = await _context.Missions
-                .Include(i => i.Status)
-                .Where(m => m.MissionId == missionId)
-                .ExecuteUpdateAsync(setters => setters.SetProperty(m => m.Status, status));
-            
-            return Ok(mission);
+            var mission = await _context.Missions.FindAsync(missionId);
+                if (mission == null) return NotFound();
+                
+            mission.MissionName = missionDto.MissionName;
+            mission.LaunchDate = missionDto.LaunchDate;
+            mission.Duration =  missionDto.Duration;
+            mission.Status =  missionDto.Status;
+            mission.Type = missionDto.Type;
+            mission.RocketId = missionDto.RocketId;
+            mission.LaunchPadId = missionDto.LaunchPadId;
+            mission.ManagerId = missionDto.ManagerId;
+            mission.TargetBodyId = missionDto.TargetBodyId;
+
+            _context.Entry(mission).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+        
+            return NoContent();
         }
+        
         
         
     }

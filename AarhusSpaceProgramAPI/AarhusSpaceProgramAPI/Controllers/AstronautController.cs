@@ -74,7 +74,7 @@ public class AstronautController : ControllerBase
         {
             return NotFound();
         }
-        astronaut.Name = dto.Name;
+        astronaut.Name = dto.Name;  
         astronaut.HireDate = dto.HireDate;
         astronaut.PayGrade = dto.PayGrade;
         astronaut.Rank = dto.Rank;
