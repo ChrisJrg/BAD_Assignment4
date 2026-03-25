@@ -18,6 +18,17 @@ public class ScientistController : ControllerBase
         _context = context;
         _logger = logger;
     }
+    
+    private void LogHttpCall(int statusCode)
+    {
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = statusCode,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+    }
 
 
     [HttpGet]
@@ -32,7 +43,8 @@ public class ScientistController : ControllerBase
                 Title = s.Title,
                 Specialty = s.Specialty,
             }).ToListAsync();
-        
+
+        LogHttpCall(200);
         return Ok(scientists);
     }
 
@@ -60,13 +72,8 @@ public class ScientistController : ControllerBase
             Specialty = scientist.Specialty,
         };
         
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 200,
-            Timestamp = DateTimeOffset.UtcNow
-        });
+        LogHttpCall(200);
+
         
         return Ok(resultDto);
     }
@@ -77,13 +84,8 @@ public class ScientistController : ControllerBase
         var  scientist = await _context.Scientists.FindAsync(id);
         if (scientist == null)
         {
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 404,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(404);
+
             return NotFound();
         }
 
@@ -95,13 +97,8 @@ public class ScientistController : ControllerBase
         _context.Entry(scientist).State = EntityState.Modified;
         await _context.SaveChangesAsync();
         
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 204,
-            Timestamp = DateTimeOffset.UtcNow
-        });
+        LogHttpCall(204);
+
         return NoContent();
     }
 
@@ -111,26 +108,16 @@ public class ScientistController : ControllerBase
         var scientist = await _context.Scientists.FindAsync(id);
         if (scientist == null)
         {
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 404,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(204);
+
             return NotFound();
         }
 
         _context.Scientists.Remove(scientist);
         await _context.SaveChangesAsync();
         
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 204,
-            Timestamp = DateTimeOffset.UtcNow
-        });
+        LogHttpCall(204);
+
         
         return NoContent();
     }

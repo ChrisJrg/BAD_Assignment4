@@ -18,6 +18,17 @@ public class RocketController : ControllerBase
         _context = context;
         _logger = logger;
     }
+    
+    private void LogHttpCall(int statusCode)
+    {
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = statusCode,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+    }
 
 
     [HttpGet]
@@ -34,7 +45,8 @@ public class RocketController : ControllerBase
                 FuelCapacity =  r.FuelCapacity,
                 PayloadCapacity =  r.PayloadCapacity,
             }).ToListAsync();
-        
+
+        LogHttpCall(200);
         return Ok(rockets);
     }
 
@@ -50,8 +62,12 @@ public class RocketController : ControllerBase
             FuelCapacity =  dto.FuelCapacity,
             PayloadCapacity =  dto.PayloadCapacity,
         };
-        
-            if (rocket.Weight < 0) return Conflict("Weight cannot be negative");
+
+        if (rocket.Weight < 0)
+        {
+            LogHttpCall(409);
+            return Conflict("Weight cannot be negative");
+        }
         
         
         _context.Rockets.Add(rocket);
@@ -66,14 +82,8 @@ public class RocketController : ControllerBase
             FuelCapacity =  rocket.FuelCapacity,
             PayloadCapacity =  rocket.PayloadCapacity,
         };
-        
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 200,
-            Timestamp = DateTimeOffset.UtcNow
-        });
+
+        LogHttpCall(200);
         
         return Ok(resultDto);
     }
@@ -84,13 +94,8 @@ public class RocketController : ControllerBase
         var  rocket = await _context.Rockets.FindAsync(id);
         if (rocket == null)
         {
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 404,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(404);
+
             return NotFound();
         }
         rocket.Model = dto.Model;
@@ -99,21 +104,18 @@ public class RocketController : ControllerBase
         rocket.Stages = dto.Stages;
         rocket.FuelCapacity =  dto.FuelCapacity;
         rocket.PayloadCapacity = dto.PayloadCapacity;
-        
-        if (rocket.Weight < 0) return Conflict("Weight cannot be negative");
+
+        if (rocket.Weight < 0)
+        {
+            LogHttpCall(409);
+            return Conflict("Weight cannot be negative");
+        }
         
         
         _context.Entry(rocket).State = EntityState.Modified;
         await _context.SaveChangesAsync();
         
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 204,
-            Timestamp = DateTimeOffset.UtcNow
-        });
-        
+        LogHttpCall(204);
         return NoContent();
     }
 
@@ -123,26 +125,16 @@ public class RocketController : ControllerBase
         var rocket = await _context.Rockets.FindAsync(id);
         if (rocket == null)
         {
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 404,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(404);
+
             return NotFound();
         }
 
         _context.Rockets.Remove(rocket);
         await _context.SaveChangesAsync();
         
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 204,
-            Timestamp = DateTimeOffset.UtcNow
-        });
+        LogHttpCall(204);
+
         
         return NoContent();
     }
