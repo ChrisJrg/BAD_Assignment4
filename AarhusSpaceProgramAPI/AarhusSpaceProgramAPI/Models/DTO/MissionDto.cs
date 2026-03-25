@@ -11,7 +11,7 @@ public class MissionDto
     
     
     public int? RocketId { get; set; }
-    public int? LaunchpPadId { get; set; }
+    public int? LaunchPadId { get; set; }
     public int? ManagerId { get; set; }
     public int? TargetBodyId { get; set; }
     

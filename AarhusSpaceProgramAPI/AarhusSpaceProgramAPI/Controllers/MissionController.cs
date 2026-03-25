@@ -16,7 +16,7 @@ namespace AarhusSpaceProgramAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<MissionPostDto>> CreateMission([FromBody]MissionPostDto missionDto)
+        public async Task<ActionResult<MissionDto>> CreateMission([FromBody] MissionPostDto missionDto)
         {
             var mission = new Mission
             {
@@ -24,13 +24,12 @@ namespace AarhusSpaceProgramAPI.Controllers
                 LaunchDate = missionDto.LaunchDate,
                 Duration = missionDto.Duration,
                 Status = missionDto.Status,
-                Type = missionDto.Type,
-    };
-            
+                Type = missionDto.Type, 
+            };
             _context.Missions.Add(mission);
             await _context.SaveChangesAsync();
 
-            var resultDto = new MissionPostDto
+            var resultDto = new MissionDto
             {
                 MissionName = mission.MissionName,
                 LaunchDate = mission.LaunchDate,
@@ -38,7 +37,7 @@ namespace AarhusSpaceProgramAPI.Controllers
                 Status = mission.Status,
                 Type = mission.Type,
             };
-            return CreatedAtAction(missionDto.MissionName,new {mission.MissionName}, resultDto); 
+            return Ok(resultDto);
         }
         
         [HttpGet]
@@ -54,7 +53,7 @@ namespace AarhusSpaceProgramAPI.Controllers
                     Status =  m.Status,
                     Type = m.Type,
                     RocketId = m.RocketId,
-                    LaunchpPadId = m.LaunchpPadId,
+                    LaunchPadId = m.LaunchPadId,
                     ManagerId = m.ManagerId,
                     TargetBodyId = m.TargetBodyId
                 }).ToListAsync();
