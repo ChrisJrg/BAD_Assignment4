@@ -5,12 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Data;
 using Scalar.AspNetCore;
 using AarhusSpaceProgramAPI.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-using (var context = new ApplicationDbContext())
+builder.Host.UseSerilog((context, config) =>
 {
-    SeedDb(context);
-}
+    config.ReadFrom.Configuration(context.Configuration);
+});
+
 
 // Add services to the container.
 
@@ -53,6 +55,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     );
 
 var app = builder.Build();
+
+using (var context = new ApplicationDbContext())
+{
+    SeedDb(context);
+}
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

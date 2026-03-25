@@ -11,10 +11,12 @@ namespace AarhusSpaceProgramAPI.Controllers;
 public class LaunchPadController : ControllerBase
 {
     private readonly  ApplicationDbContext _context;
+    private readonly ILogger<LaunchPadController> _logger;
 
-    public LaunchPadController(ApplicationDbContext context)
+    public LaunchPadController(ApplicationDbContext context,  ILogger<LaunchPadController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
 
@@ -54,6 +56,14 @@ public class LaunchPadController : ControllerBase
             CurrentStatus = launchPad.CurrentStatus,
         };
         
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 200,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+        
         return Ok(resultDto);
     }
 
@@ -63,6 +73,13 @@ public class LaunchPadController : ControllerBase
         var  launchPad = await _context.LaunchPads.FindAsync(id);
         if (launchPad == null)
         {
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 404,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             return NotFound();
         }
         launchPad.LaunchPadId = dto.LaunchPadId;
@@ -71,6 +88,15 @@ public class LaunchPadController : ControllerBase
         launchPad.CurrentStatus = dto.CurrentStatus;
         
         await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 204,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+        
         return NoContent();
     }
 
@@ -85,6 +111,14 @@ public class LaunchPadController : ControllerBase
 
         _context.LaunchPads.Remove(launchPad);
         await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 204,
+            Timestamp = DateTimeOffset.UtcNow
+        });
         
         return NoContent();
     }

@@ -11,10 +11,12 @@ namespace AarhusSpaceProgramAPI.Controllers;
 public class ScientistController : ControllerBase
 {
     private readonly  ApplicationDbContext _context;
+    private readonly  ILogger<ScientistController> _logger;
 
-    public ScientistController(ApplicationDbContext context)
+    public ScientistController(ApplicationDbContext context,  ILogger<ScientistController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
 
@@ -58,6 +60,14 @@ public class ScientistController : ControllerBase
             Specialty = scientist.Specialty,
         };
         
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 200,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+        
         return Ok(resultDto);
     }
 
@@ -67,6 +77,13 @@ public class ScientistController : ControllerBase
         var  scientist = await _context.Scientists.FindAsync(id);
         if (scientist == null)
         {
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 404,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             return NotFound();
         }
 
@@ -77,6 +94,14 @@ public class ScientistController : ControllerBase
         
         _context.Entry(scientist).State = EntityState.Modified;
         await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 204,
+            Timestamp = DateTimeOffset.UtcNow
+        });
         return NoContent();
     }
 
@@ -86,11 +111,26 @@ public class ScientistController : ControllerBase
         var scientist = await _context.Scientists.FindAsync(id);
         if (scientist == null)
         {
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 404,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             return NotFound();
         }
 
         _context.Scientists.Remove(scientist);
         await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 204,
+            Timestamp = DateTimeOffset.UtcNow
+        });
         
         return NoContent();
     }

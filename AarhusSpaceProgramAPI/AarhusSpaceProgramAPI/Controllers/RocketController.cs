@@ -11,10 +11,12 @@ namespace AarhusSpaceProgramAPI.Controllers;
 public class RocketController : ControllerBase
 {
     private readonly  ApplicationDbContext _context;
+    private readonly ILogger<ManagerController> _logger;
 
-    public RocketController(ApplicationDbContext context)
+    public RocketController(ApplicationDbContext context,  ILogger<ManagerController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
 
@@ -64,6 +66,14 @@ public class RocketController : ControllerBase
             PayloadCapacity =  rocket.PayloadCapacity,
         };
         
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 200,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+        
         return Ok(resultDto);
     }
 
@@ -73,6 +83,13 @@ public class RocketController : ControllerBase
         var  rocket = await _context.Rockets.FindAsync(id);
         if (rocket == null)
         {
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 404,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             return NotFound();
         }
 
@@ -86,6 +103,15 @@ public class RocketController : ControllerBase
         
         _context.Entry(rocket).State = EntityState.Modified;
         await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 204,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+        
         return NoContent();
     }
 
@@ -95,11 +121,26 @@ public class RocketController : ControllerBase
         var rocket = await _context.Rockets.FindAsync(id);
         if (rocket == null)
         {
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 404,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             return NotFound();
         }
 
         _context.Rockets.Remove(rocket);
         await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 204,
+            Timestamp = DateTimeOffset.UtcNow
+        });
         
         return NoContent();
     }

@@ -11,10 +11,12 @@ namespace AarhusSpaceProgramAPI.Controllers;
 public class ManagerController : ControllerBase
 {
     private readonly  ApplicationDbContext _context;
+    private readonly ILogger<ManagerController> _logger;
 
-    public ManagerController(ApplicationDbContext context)
+    public ManagerController(ApplicationDbContext context, ILogger<ManagerController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
 
@@ -54,6 +56,14 @@ public class ManagerController : ControllerBase
             HireDate = manager.HireDate,
         };
         
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 200,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+        
         return Ok(resultDto);
     }
 
@@ -63,6 +73,13 @@ public class ManagerController : ControllerBase
         var  manager = await _context.Managers.FindAsync(id);
         if (manager == null)
         {
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 404,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             return NotFound();
         }
         manager.Name = dto.Name;
@@ -70,6 +87,14 @@ public class ManagerController : ControllerBase
         manager.HireDate = dto.HireDate;
         
         await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 204,
+            Timestamp = DateTimeOffset.UtcNow
+        });
         return NoContent();
     }
 
@@ -79,12 +104,26 @@ public class ManagerController : ControllerBase
         var manager = await _context.Managers.FindAsync(id);
         if (manager == null)
         {
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 404,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             return NotFound();
         }
 
         _context.Managers.Remove(manager);
         await _context.SaveChangesAsync();
         
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 204,
+            Timestamp = DateTimeOffset.UtcNow
+        });
         return NoContent();
     }
     

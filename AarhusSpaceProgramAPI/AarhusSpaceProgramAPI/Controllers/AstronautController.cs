@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Data;
-using  AarhusSpaceProgramAPI.Models;
+using AarhusSpaceProgramAPI.Models;
 
 namespace AarhusSpaceProgramAPI.Controllers;
 
@@ -11,10 +11,12 @@ namespace AarhusSpaceProgramAPI.Controllers;
 public class AstronautController : ControllerBase
 {
     private readonly  ApplicationDbContext _context;
+    private readonly ILogger<AstronautController> _logger;
 
-    public AstronautController(ApplicationDbContext context)
+    public AstronautController(ApplicationDbContext context, ILogger<AstronautController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
 
@@ -54,7 +56,7 @@ public class AstronautController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<AstronautDto>> CreateAstronaut([FromForm] AstronautDto dto)
+    public async Task<ActionResult<AstronautDto>> CreateAstronaut([FromBody] AstronautDto dto)
     {
         var astronaut = new Astronaut
         {
@@ -79,16 +81,31 @@ public class AstronautController : ControllerBase
             EXPInSim = astronaut.EXPInSim,
             EXPInSpace = astronaut.EXPInSpace,
         };
+
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 200,
+            Timestamp = DateTimeOffset.UtcNow
+        });
         
         return Ok(resultDto);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAstronaut(int id, [FromForm] AstronautDto dto)
+    public async Task<IActionResult> UpdateAstronaut(int id, [FromBody] AstronautDto dto)
     {
         var  astronaut = await _context.Astronauts.FindAsync(id);
         if (astronaut == null)
         {
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 404,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             return NotFound();
         }
         
@@ -100,6 +117,15 @@ public class AstronautController : ControllerBase
         astronaut.EXPInSpace = dto.EXPInSpace;
         
         await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 204,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+        
         return NoContent();
     }
 
@@ -109,11 +135,26 @@ public class AstronautController : ControllerBase
         var astronaut = await _context.Astronauts.FindAsync(id);
         if (astronaut == null)
         {
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 404,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             return NotFound();
         }
 
         _context.Astronauts.Remove(astronaut);
         await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = 204,
+            Timestamp = DateTimeOffset.UtcNow
+        });
         
         return NoContent();
     }

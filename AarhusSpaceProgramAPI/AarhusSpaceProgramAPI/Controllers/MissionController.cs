@@ -13,9 +13,11 @@ namespace AarhusSpaceProgramAPI.Controllers
     {
         private readonly ApplicationDbContext _context;
         private string[] Statuses = ["Created", "Budgeted", "Approved", "Planned", "Active", "Completed", "Aborted", "Failed"];
-        public MissionController(ApplicationDbContext context)
+        private readonly ILogger<MissionController> _logger;
+        public MissionController(ApplicationDbContext context, ILogger<MissionController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -48,6 +50,15 @@ namespace AarhusSpaceProgramAPI.Controllers
                 Status = mission.Status,
                 Type = mission.Type,
             };
+            
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 204,
+                Timestamp = DateTimeOffset.UtcNow
+            });
+            
             return Ok(resultDto);
         }
         
@@ -90,7 +101,7 @@ namespace AarhusSpaceProgramAPI.Controllers
                     TargetBodyName = m.TargetBody.Name
                 }).ToListAsync();
             
-            return  Ok(missions);
+            return Ok(missions);
         }
 
         [HttpDelete("{missionId}")]
@@ -99,11 +110,26 @@ namespace AarhusSpaceProgramAPI.Controllers
             var mission = await _context.Missions.FindAsync(missionId);
             if (mission == null)
             {
+                _logger.LogInformation("HTTP call {@LogInfo}", new
+                {
+                    HttpMethod = HttpContext.Request.Method,
+                    RequestPath = HttpContext.Request.Path.ToString(),
+                    StatusCode = 404,
+                    Timestamp = DateTimeOffset.UtcNow
+                });
                 return NotFound();
             }
 
             _context.Missions.Remove(mission);
             await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 204,
+                Timestamp = DateTimeOffset.UtcNow
+            });
         
             return NoContent();
         }
@@ -114,16 +140,46 @@ namespace AarhusSpaceProgramAPI.Controllers
             var mission = await _context.Missions
                 .Include(i => i.Astronauts)
                 .SingleOrDefaultAsync(m => m.MissionId == missionId);
-            if (mission == null) return Conflict("No mission is assigned this ID");
+            if (mission == null)
+            {
+                _logger.LogInformation("HTTP call {@LogInfo}", new
+                {
+                    HttpMethod = HttpContext.Request.Method,
+                    RequestPath = HttpContext.Request.Path.ToString(),
+                    StatusCode = 409,
+                    Timestamp = DateTimeOffset.UtcNow
+                });
+                return Conflict("No mission is assigned this ID");
+            }
             
             
             var astronaut = await _context.Astronauts
                 .SingleOrDefaultAsync(a => a.AstronautId == astronautId);
-            if (astronaut == null) return Conflict("No astronaut is assigned this ID");
+            if (astronaut == null)
+            {
+                
+                _logger.LogInformation("HTTP call {@LogInfo}", new
+                {
+                    HttpMethod = HttpContext.Request.Method,
+                    RequestPath = HttpContext.Request.Path.ToString(),
+                    StatusCode = 409,
+                    Timestamp = DateTimeOffset.UtcNow
+                });
+                
+                return Conflict("No astronaut is assigned this ID");
+            }
             
             
             mission.Astronauts.Add(astronaut);
             await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 200,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             
             return Ok(mission);
         }
@@ -134,16 +190,44 @@ namespace AarhusSpaceProgramAPI.Controllers
             var mission = await _context.Missions
                 .Include(i => i.Astronauts)
                 .SingleOrDefaultAsync(m => m.MissionId == missionId);
-            if (mission == null) return Conflict("No mission is assigned this ID");
+            if (mission == null)
+            {
+                _logger.LogInformation("HTTP call {@LogInfo}", new
+                {
+                    HttpMethod = HttpContext.Request.Method,
+                    RequestPath = HttpContext.Request.Path.ToString(),
+                    StatusCode = 409,
+                    Timestamp = DateTimeOffset.UtcNow
+                });
+                return Conflict("No mission is assigned this ID");
+            }
             
             
             var astronaut = await _context.Astronauts
                 .SingleOrDefaultAsync(a => a.AstronautId == astronautId);
-            if (astronaut == null) return Conflict("No astronaut is assigned this ID");
+            if (astronaut == null)
+            {
+                _logger.LogInformation("HTTP call {@LogInfo}", new
+                {
+                    HttpMethod = HttpContext.Request.Method,
+                    RequestPath = HttpContext.Request.Path.ToString(),
+                    StatusCode = 409,
+                    Timestamp = DateTimeOffset.UtcNow
+                });
+                return Conflict("No astronaut is assigned this ID");
+            }
             
             
             mission.Astronauts.Remove(astronaut);
             await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 204,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             
             return NoContent();
         }
@@ -154,14 +238,41 @@ namespace AarhusSpaceProgramAPI.Controllers
             var mission = await _context.Missions
                 .Include(i => i.Scientists)
                 .SingleOrDefaultAsync(m => m.MissionId == missionId);
-            if (mission == null) return Conflict("No mission is assigned this ID");
+            if (mission == null)
+            {
+                _logger.LogInformation("HTTP call {@LogInfo}", new
+                {
+                    HttpMethod = HttpContext.Request.Method,
+                    RequestPath = HttpContext.Request.Path.ToString(),
+                    StatusCode = 409,
+                    Timestamp = DateTimeOffset.UtcNow
+                });
+                return Conflict("No mission is assigned this ID");
+            }
             
             var scientist = await _context.Scientists
                 .SingleOrDefaultAsync(a => a.ScientistId == scientistId);
-            if (scientist == null) return Conflict("No scientist is assigned this ID");
+            if (scientist == null)
+            {
+                _logger.LogInformation("HTTP call {@LogInfo}", new
+                {
+                    HttpMethod = HttpContext.Request.Method,
+                    RequestPath = HttpContext.Request.Path.ToString(),
+                    StatusCode = 409,
+                    Timestamp = DateTimeOffset.UtcNow
+                });
+                return Conflict("No scientist is assigned this ID");
+            }
             
             mission.Scientists.Add(scientist);
             await _context.SaveChangesAsync();
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 204,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             
             return NoContent();
         }
@@ -172,14 +283,42 @@ namespace AarhusSpaceProgramAPI.Controllers
             var mission = await _context.Missions
                 .Include(i => i.Scientists)
                 .SingleOrDefaultAsync(m => m.MissionId == missionId);
-            if (mission == null) return Conflict("No mission is assigned this ID");
+            if (mission == null)
+            {
+                _logger.LogInformation("HTTP call {@LogInfo}", new
+                {
+                    HttpMethod = HttpContext.Request.Method,
+                    RequestPath = HttpContext.Request.Path.ToString(),
+                    StatusCode = 409,
+                    Timestamp = DateTimeOffset.UtcNow
+                });
+                return Conflict("No mission is assigned this ID");
+            }
             
             var scientist = await _context.Scientists
                 .SingleOrDefaultAsync(a => a.ScientistId == scientistId);
-            if (scientist == null) return Conflict("No scientist is assigned this ID");
+            if (scientist == null)
+            {
+                _logger.LogInformation("HTTP call {@LogInfo}", new
+                {
+                    HttpMethod = HttpContext.Request.Method,
+                    RequestPath = HttpContext.Request.Path.ToString(),
+                    StatusCode = 409,
+                    Timestamp = DateTimeOffset.UtcNow
+                });
+                return Conflict("No scientist is assigned this ID");
+            }
             
             mission.Scientists.Remove(scientist);
             await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 204,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             
             return NoContent();
         }
@@ -187,7 +326,17 @@ namespace AarhusSpaceProgramAPI.Controllers
         [HttpPut("StatusUpdate/{missionId}")]
         public async Task<IActionResult> UpdateMissionStatus(string status, int missionId)
         {
-            if (string.IsNullOrEmpty(status)) return BadRequest("Status is required");
+            if (string.IsNullOrEmpty(status))
+            {
+                _logger.LogInformation("HTTP call {@LogInfo}", new
+                {
+                    HttpMethod = HttpContext.Request.Method,
+                    RequestPath = HttpContext.Request.Path.ToString(),
+                    StatusCode = 400,
+                    Timestamp = DateTimeOffset.UtcNow
+                });
+                return BadRequest("Status is required");
+            }
             if (!Statuses.Contains(status)) throw new ArgumentException();
             
             var mission = await _context.Missions
@@ -196,6 +345,14 @@ namespace AarhusSpaceProgramAPI.Controllers
                 .ExecuteUpdateAsync(setters => setters.SetProperty(m => m.Status, status));
 
             await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 200,
+                Timestamp = DateTimeOffset.UtcNow
+            });
             return Ok(mission);
         }
         
@@ -203,7 +360,17 @@ namespace AarhusSpaceProgramAPI.Controllers
         public async Task<IActionResult> UpdateMission(int missionId, [FromForm] MissionDto missionDto)
         {
             var mission = await _context.Missions.FindAsync(missionId);
-                if (mission == null) return NotFound();
+            if (mission == null)
+            {
+                _logger.LogInformation("HTTP call {@LogInfo}", new
+                {
+                    HttpMethod = HttpContext.Request.Method,
+                    RequestPath = HttpContext.Request.Path.ToString(),
+                    StatusCode = 404,
+                    Timestamp = DateTimeOffset.UtcNow
+                });
+                return NotFound();
+            }
                 
             mission.MissionName = missionDto.MissionName;
             mission.LaunchDate = missionDto.LaunchDate;
@@ -217,6 +384,14 @@ namespace AarhusSpaceProgramAPI.Controllers
 
             _context.Entry(mission).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+            
+            _logger.LogInformation("HTTP call {@LogInfo}", new
+            {
+                HttpMethod = HttpContext.Request.Method,
+                RequestPath = HttpContext.Request.Path.ToString(),
+                StatusCode = 204,
+                Timestamp = DateTimeOffset.UtcNow
+            });
         
             return NoContent();
         }
