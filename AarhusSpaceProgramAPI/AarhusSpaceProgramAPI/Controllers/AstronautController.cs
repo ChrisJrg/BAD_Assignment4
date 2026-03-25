@@ -18,7 +18,7 @@ public class AstronautController : ControllerBase
     }
 
 
-    [HttpGet("{space-experience}")]
+    [HttpGet("space-experience")]
     public async Task<ActionResult<IEnumerable<AstronautExperienceDto>>> GetAstronautsBySpaceExperience()
     {
         var astronauts = await _context.Astronauts
