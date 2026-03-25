@@ -63,7 +63,7 @@ public class AstronautController : ControllerBase
             EXPInSpace = astronaut.EXPInSpace,
         };
         
-        return CreatedAtAction(nameof(GetAstronauts), new { id = astronaut.AstronautId }, resultDto);
+        return Ok(resultDto);
     }
 
     [HttpPut("{id}")]
