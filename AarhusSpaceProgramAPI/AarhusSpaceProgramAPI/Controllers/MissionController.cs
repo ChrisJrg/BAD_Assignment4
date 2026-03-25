@@ -77,13 +77,8 @@ namespace AarhusSpaceProgramAPI.Controllers
                 Type = mission.Type,
             };
             
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 204,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(200);
+
             
             return Ok(resultDto);
         }
@@ -106,6 +101,7 @@ namespace AarhusSpaceProgramAPI.Controllers
                     TargetBodyId = m.TargetBodyId
                 }).ToListAsync();
         
+            
             return Ok(mission);
         }
         
@@ -136,26 +132,16 @@ namespace AarhusSpaceProgramAPI.Controllers
             var mission = await _context.Missions.FindAsync(missionId);
             if (mission == null)
             {
-                _logger.LogInformation("HTTP call {@LogInfo}", new
-                {
-                    HttpMethod = HttpContext.Request.Method,
-                    RequestPath = HttpContext.Request.Path.ToString(),
-                    StatusCode = 404,
-                    Timestamp = DateTimeOffset.UtcNow
-                });
+                LogHttpCall(404);
+
                 return NotFound();
             }
 
             _context.Missions.Remove(mission);
             await _context.SaveChangesAsync();
             
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 204,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(204);
+
         
             return NoContent();
         }
@@ -168,13 +154,8 @@ namespace AarhusSpaceProgramAPI.Controllers
                 .SingleOrDefaultAsync(m => m.MissionId == missionId);
             if (mission == null)
             {
-                _logger.LogInformation("HTTP call {@LogInfo}", new
-                {
-                    HttpMethod = HttpContext.Request.Method,
-                    RequestPath = HttpContext.Request.Path.ToString(),
-                    StatusCode = 409,
-                    Timestamp = DateTimeOffset.UtcNow
-                });
+                LogHttpCall(409);
+
                 return Conflict("No mission is assigned this ID");
             }
             
@@ -184,13 +165,8 @@ namespace AarhusSpaceProgramAPI.Controllers
             if (astronaut == null)
             {
                 
-                _logger.LogInformation("HTTP call {@LogInfo}", new
-                {
-                    HttpMethod = HttpContext.Request.Method,
-                    RequestPath = HttpContext.Request.Path.ToString(),
-                    StatusCode = 409,
-                    Timestamp = DateTimeOffset.UtcNow
-                });
+                LogHttpCall(409);
+
                 
                 return Conflict("No astronaut is assigned this ID");
             }
@@ -199,13 +175,7 @@ namespace AarhusSpaceProgramAPI.Controllers
             mission.Astronauts.Add(astronaut);
             await _context.SaveChangesAsync();
             
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 200,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(200);
             
             return Ok(mission);
         }
@@ -218,13 +188,8 @@ namespace AarhusSpaceProgramAPI.Controllers
                 .SingleOrDefaultAsync(m => m.MissionId == missionId);
             if (mission == null)
             {
-                _logger.LogInformation("HTTP call {@LogInfo}", new
-                {
-                    HttpMethod = HttpContext.Request.Method,
-                    RequestPath = HttpContext.Request.Path.ToString(),
-                    StatusCode = 409,
-                    Timestamp = DateTimeOffset.UtcNow
-                });
+                LogHttpCall(409);
+
                 return Conflict("No mission is assigned this ID");
             }
             
@@ -233,13 +198,8 @@ namespace AarhusSpaceProgramAPI.Controllers
                 .SingleOrDefaultAsync(a => a.AstronautId == astronautId);
             if (astronaut == null)
             {
-                _logger.LogInformation("HTTP call {@LogInfo}", new
-                {
-                    HttpMethod = HttpContext.Request.Method,
-                    RequestPath = HttpContext.Request.Path.ToString(),
-                    StatusCode = 409,
-                    Timestamp = DateTimeOffset.UtcNow
-                });
+                LogHttpCall(409);
+
                 return Conflict("No astronaut is assigned this ID");
             }
             
@@ -247,13 +207,8 @@ namespace AarhusSpaceProgramAPI.Controllers
             mission.Astronauts.Remove(astronaut);
             await _context.SaveChangesAsync();
             
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 204,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(204);
+
             
             return NoContent();
         }
@@ -266,13 +221,8 @@ namespace AarhusSpaceProgramAPI.Controllers
                 .SingleOrDefaultAsync(m => m.MissionId == missionId);
             if (mission == null)
             {
-                _logger.LogInformation("HTTP call {@LogInfo}", new
-                {
-                    HttpMethod = HttpContext.Request.Method,
-                    RequestPath = HttpContext.Request.Path.ToString(),
-                    StatusCode = 409,
-                    Timestamp = DateTimeOffset.UtcNow
-                });
+                LogHttpCall(409);
+
                 return Conflict("No mission is assigned this ID");
             }
             
@@ -280,25 +230,15 @@ namespace AarhusSpaceProgramAPI.Controllers
                 .SingleOrDefaultAsync(a => a.ScientistId == scientistId);
             if (scientist == null)
             {
-                _logger.LogInformation("HTTP call {@LogInfo}", new
-                {
-                    HttpMethod = HttpContext.Request.Method,
-                    RequestPath = HttpContext.Request.Path.ToString(),
-                    StatusCode = 409,
-                    Timestamp = DateTimeOffset.UtcNow
-                });
+                LogHttpCall(409);
+
                 return Conflict("No scientist is assigned this ID");
             }
             
             mission.Scientists.Add(scientist);
             await _context.SaveChangesAsync();
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 204,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(204);
+
             
             return NoContent();
         }
@@ -311,13 +251,8 @@ namespace AarhusSpaceProgramAPI.Controllers
                 .SingleOrDefaultAsync(m => m.MissionId == missionId);
             if (mission == null)
             {
-                _logger.LogInformation("HTTP call {@LogInfo}", new
-                {
-                    HttpMethod = HttpContext.Request.Method,
-                    RequestPath = HttpContext.Request.Path.ToString(),
-                    StatusCode = 409,
-                    Timestamp = DateTimeOffset.UtcNow
-                });
+                LogHttpCall(409);
+
                 return Conflict("No mission is assigned this ID");
             }
             
@@ -325,26 +260,16 @@ namespace AarhusSpaceProgramAPI.Controllers
                 .SingleOrDefaultAsync(a => a.ScientistId == scientistId);
             if (scientist == null)
             {
-                _logger.LogInformation("HTTP call {@LogInfo}", new
-                {
-                    HttpMethod = HttpContext.Request.Method,
-                    RequestPath = HttpContext.Request.Path.ToString(),
-                    StatusCode = 409,
-                    Timestamp = DateTimeOffset.UtcNow
-                });
+                LogHttpCall(409);
+
                 return Conflict("No scientist is assigned this ID");
             }
             
             mission.Scientists.Remove(scientist);
             await _context.SaveChangesAsync();
             
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 204,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(204);
+
             
             return NoContent();
         }
@@ -354,13 +279,8 @@ namespace AarhusSpaceProgramAPI.Controllers
         {
             if (string.IsNullOrEmpty(status))
             {
-                _logger.LogInformation("HTTP call {@LogInfo}", new
-                {
-                    HttpMethod = HttpContext.Request.Method,
-                    RequestPath = HttpContext.Request.Path.ToString(),
-                    StatusCode = 400,
-                    Timestamp = DateTimeOffset.UtcNow
-                });
+                LogHttpCall(400);
+
                 return BadRequest("Status is required");
             }
 
@@ -377,13 +297,8 @@ namespace AarhusSpaceProgramAPI.Controllers
 
             await _context.SaveChangesAsync();
             
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 200,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(200);
+
             return Ok(mission);
         }
         
@@ -393,13 +308,8 @@ namespace AarhusSpaceProgramAPI.Controllers
             var mission = await _context.Missions.FindAsync(missionId);
             if (mission == null)
             {
-                _logger.LogInformation("HTTP call {@LogInfo}", new
-                {
-                    HttpMethod = HttpContext.Request.Method,
-                    RequestPath = HttpContext.Request.Path.ToString(),
-                    StatusCode = 404,
-                    Timestamp = DateTimeOffset.UtcNow
-                });
+                LogHttpCall(404);
+
                 return NotFound();
             }
                 
@@ -424,14 +334,8 @@ namespace AarhusSpaceProgramAPI.Controllers
             _context.Entry(mission).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 204,
-                Timestamp = DateTimeOffset.UtcNow
-            });
-        
+            LogHttpCall(204);
+            
             return NoContent();
         }
         
@@ -447,7 +351,6 @@ namespace AarhusSpaceProgramAPI.Controllers
                 Scientists =  m.Scientists
             }).ToListAsync();
 
-            LogHttpCall(200);
             return Ok(mission);
         }
         
