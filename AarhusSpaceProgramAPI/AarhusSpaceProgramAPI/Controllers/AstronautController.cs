@@ -18,6 +18,23 @@ public class AstronautController : ControllerBase
     }
 
 
+    [HttpGet("space-experience")]
+    public async Task<ActionResult<IEnumerable<AstronautExperienceDto>>> GetAstronautsBySpaceExperience()
+    {
+        var astronauts = await _context.Astronauts
+            .OrderByDescending(a => a.EXPInSpace)
+            .Select(a => new AstronautExperienceDto
+            {
+                AstronautId =  a.AstronautId,
+                Name = a.Name,
+                Rank = a.Rank,
+                EXPInSpace = a.EXPInSpace,
+            }).ToListAsync();
+        
+        return Ok(astronauts);
+    }
+
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AstronautDto>>> GetAstronauts()
     {
