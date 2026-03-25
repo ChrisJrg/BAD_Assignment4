@@ -34,7 +34,7 @@ public class LaunchPadController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<LaunchPadDto>> CreateLaunchPad(LaunchPadDto dto)
+    public async Task<ActionResult<LaunchPadDto>> CreateLaunchPad([FromForm] LaunchPadDto dto)
     {
         var launchPad = new LaunchPad
         {
@@ -58,7 +58,7 @@ public class LaunchPadController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateLaunchPad(int id, LaunchPadDto dto)
+    public async Task<IActionResult> UpdateLaunchPad(int id, [FromForm] LaunchPadDto dto)
     {
         var  launchPad = await _context.LaunchPads.FindAsync(id);
         if (launchPad == null)
@@ -70,7 +70,6 @@ public class LaunchPadController : ControllerBase
         launchPad.MaxWeight = dto.MaxWeight;
         launchPad.CurrentStatus = dto.CurrentStatus;
         
-        _context.Entry(launchPad).State = EntityState.Modified;
         await _context.SaveChangesAsync();
         return NoContent();
     }

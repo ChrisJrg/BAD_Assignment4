@@ -54,7 +54,7 @@ public class AstronautController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<AstronautDto>> CreateAstronaut(AstronautDto dto)
+    public async Task<ActionResult<AstronautDto>> CreateAstronaut([FromForm] AstronautDto dto)
     {
         var astronaut = new Astronaut
         {
@@ -84,13 +84,14 @@ public class AstronautController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAstronaut(int id, AstronautDto dto)
+    public async Task<IActionResult> UpdateAstronaut(int id, [FromForm] AstronautDto dto)
     {
         var  astronaut = await _context.Astronauts.FindAsync(id);
         if (astronaut == null)
         {
             return NotFound();
         }
+        
         astronaut.Name = dto.Name;  
         astronaut.HireDate = dto.HireDate;
         astronaut.PayGrade = dto.PayGrade;
@@ -98,7 +99,6 @@ public class AstronautController : ControllerBase
         astronaut.EXPInSim = dto.EXPInSim;
         astronaut.EXPInSpace = dto.EXPInSpace;
         
-        _context.Entry(astronaut).State = EntityState.Modified;
         await _context.SaveChangesAsync();
         return NoContent();
     }
