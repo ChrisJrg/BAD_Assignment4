@@ -16,37 +16,67 @@ namespace AarhusSpaceProgramAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<MissionDto>> CreateMission(string missionName, DateTime launchDate, double duration, string status, string type, int rocketId, int launchPadId, int managerId, int targetBodyId)
+        public async Task<ActionResult<MissionPostDto>> CreateMission([FromBody]MissionPostDto missionDto)
         {
             var mission = new Mission
             {
-                MissionName = missionName,
-                LaunchDate = launchDate,
-                Duration = duration,
-                Status = status,
-                Type = type,
-                RocketId = rocketId,
-                LaunchpPadId =  launchPadId,
-                ManagerId = managerId,
-                TargetBodyId = targetBodyId
-            };
+                MissionName = missionDto.MissionName,
+                LaunchDate = missionDto.LaunchDate,
+                Duration = missionDto.Duration,
+                Status = missionDto.Status,
+                Type = missionDto.Type,
+    };
             
             _context.Missions.Add(mission);
             await _context.SaveChangesAsync();
 
-            var resultDto = new MissionDto
+            var resultDto = new MissionPostDto
             {
-                MissionName = missionName,
-                LaunchDate = launchDate,
-                Duration = duration,
-                Status = status,
-                Type = type,
-                RocketId = rocketId,
-                LaunchpPadId = launchPadId,
-                ManagerId = managerId,
-                TargetBodyId = targetBodyId
+                MissionName = mission.MissionName,
+                LaunchDate = mission.LaunchDate,
+                Duration = mission.Duration,
+                Status = mission.Status,
+                Type = mission.Type,
             };
-            return CreatedAtAction(missionName,new {mission.MissionName}, resultDto); 
+            return CreatedAtAction(missionDto.MissionName,new {mission.MissionName}, resultDto); 
+        }
+        
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<MissionDto>>> GetMissions()
+        {
+            var mission = await _context.Missions
+                .Select(m => new MissionDto
+                {
+                    MissionId =  m.MissionId,
+                    MissionName = m.MissionName,
+                    LaunchDate = m.LaunchDate,
+                    Duration =  m.Duration,
+                    Status =  m.Status,
+                    Type = m.Type,
+                    RocketId = m.RocketId,
+                    LaunchpPadId = m.LaunchpPadId,
+                    ManagerId = m.ManagerId,
+                    TargetBodyId = m.TargetBodyId
+                }).ToListAsync();
+        
+            return Ok(mission);
+        }
+        
+        
+        [HttpPut]
+        public async Task<IActionResult> UpdateMissionAssignAstronaut(int missionId, int astronautId)
+        {
+            var mission = await _context.Missions
+                .Include(i => i.Astronauts)
+                .SingleOrDefaultAsync(m => m.MissionId == missionId);
+            
+            var astronaut = await _context.Astronauts
+                .SingleOrDefaultAsync(a => a.AstronautId == astronautId);
+            
+            mission.Astronauts.Add(astronaut);
+            await _context.SaveChangesAsync();
+            
+            return Ok(mission);
         }
     }
 }

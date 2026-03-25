@@ -10,10 +10,10 @@ public class Mission
     public string Type { get; set; }
     
     
-    public int RocketId { get; set; }
-    public int LaunchpPadId { get; set; }
-    public int ManagerId { get; set; }
-    public int TargetBodyId { get; set; }
+    public int? RocketId { get; set; }
+    public int? LaunchpPadId { get; set; }
+    public int? ManagerId { get; set; }
+    public int? TargetBodyId { get; set; }
     
     public Rocket Rocket { get; set; }
     public LaunchPad LaunchPad { get; set; }
