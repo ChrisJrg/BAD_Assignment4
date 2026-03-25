@@ -80,7 +80,7 @@ public class AstronautController : ControllerBase
             EXPInSpace = astronaut.EXPInSpace,
         };
         
-        return Ok(resultDto);
+        return Ok(resultDto);   
     }
 
     [HttpPut("{id}")]

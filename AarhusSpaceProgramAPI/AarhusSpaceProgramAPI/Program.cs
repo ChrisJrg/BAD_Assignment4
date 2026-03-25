@@ -7,10 +7,7 @@ using Scalar.AspNetCore;
 using AarhusSpaceProgramAPI.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-using (var context = new ApplicationDbContext())
-{
-    SeedDb(context);
-}
+
 
 // Add services to the container.
 
@@ -113,6 +110,11 @@ app.MapGet("/cod/test",
         "text/html"));
 
 app.MapControllers().RequireCors("AnyOrigin");
+
+using (var context = new ApplicationDbContext())
+{
+    SeedDb(context);
+}
 
 void SeedDb(ApplicationDbContext context)
 {

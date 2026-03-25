@@ -43,10 +43,10 @@ entity Scientist {
 entity Rocket{
     RocketId <<key>>
     Model 
-    PayloadCap
-    CrewCap
+    PayloadCapacity
+    CrewCapacity
     Stages
-    FuelCap
+    FuelCapacity
     Weight
 }
 
