@@ -67,6 +67,27 @@ namespace AarhusSpaceProgramAPI.Controllers
         
             return Ok(mission);
         }
+        
+        [HttpGet("mission-overview")]
+        public async Task<ActionResult<IEnumerable<MissionOverviewDto>>> GetMissionOverview()
+        {
+            var missions = await _context.Missions
+                .Include(m => m.LaunchPad)
+                .Include(m => m.Manager)
+                .Include(m => m.Rocket)
+                .Include(m => m.TargetBody)
+                .Select(m => new MissionOverviewDto
+                {
+                    MissionName =  m.MissionName,
+                    LaunchDate = m.LaunchDate,
+                    ManagerName = m.Manager.Name,
+                    RocketModel = m.Rocket.Model,
+                    LaunchPadLocation = m.LaunchPad.Location,
+                    TargetBodyName = m.TargetBody.Name
+                }).ToListAsync();
+            
+            return  Ok(missions);
+        }
 
         [HttpDelete("{missionId}")]
         public async Task<IActionResult> DeleteMission(int missionId)
