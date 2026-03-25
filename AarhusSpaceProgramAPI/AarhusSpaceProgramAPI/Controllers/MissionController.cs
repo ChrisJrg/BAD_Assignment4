@@ -26,7 +26,7 @@ namespace AarhusSpaceProgramAPI.Controllers
                 Status = status,
                 Type = type,
                 RocketId = rocketId,
-                LaunchpPadId =  launchPadId,
+                LaunchPadId =  launchPadId,
                 ManagerId = managerId,
                 TargetBodyId = targetBodyId
             };
