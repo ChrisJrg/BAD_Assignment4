@@ -18,6 +18,17 @@ public class ManagerController : ControllerBase
         _context = context;
         _logger = logger;
     }
+    
+    private void LogHttpCall(int statusCode)
+    {
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = statusCode,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+    }
 
 
     [HttpGet]
@@ -55,15 +66,8 @@ public class ManagerController : ControllerBase
             Department = manager.Department,
             HireDate = manager.HireDate,
         };
-        
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 200,
-            Timestamp = DateTimeOffset.UtcNow
-        });
-        
+
+        LogHttpCall(200);
         return Ok(resultDto);
     }
 
@@ -73,13 +77,7 @@ public class ManagerController : ControllerBase
         var  manager = await _context.Managers.FindAsync(id);
         if (manager == null)
         {
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 404,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(404);
             return NotFound();
         }
         manager.Name = dto.Name;
@@ -87,14 +85,8 @@ public class ManagerController : ControllerBase
         manager.HireDate = dto.HireDate;
         
         await _context.SaveChangesAsync();
-        
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 204,
-            Timestamp = DateTimeOffset.UtcNow
-        });
+
+        LogHttpCall(204);
         return NoContent();
     }
 
@@ -104,26 +96,14 @@ public class ManagerController : ControllerBase
         var manager = await _context.Managers.FindAsync(id);
         if (manager == null)
         {
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 404,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(404);
             return NotFound();
         }
 
         _context.Managers.Remove(manager);
         await _context.SaveChangesAsync();
-        
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 204,
-            Timestamp = DateTimeOffset.UtcNow
-        });
+
+        LogHttpCall(204);
         return NoContent();
     }
     

@@ -19,6 +19,18 @@ public class AstronautController : ControllerBase
         _logger = logger;
     }
 
+    private void LogHttpCall(int statusCode)
+    {
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = statusCode,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+    }
+    
+
 
     [HttpGet("space-experience")]
     public async Task<ActionResult<IEnumerable<AstronautExperienceDto>>> GetAstronautsBySpaceExperience()
@@ -58,6 +70,7 @@ public class AstronautController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<AstronautDto>> CreateAstronaut([FromBody] AstronautDto dto)
     {
+        
         var astronaut = new Astronaut
         {
             Name = dto.Name,
@@ -82,14 +95,7 @@ public class AstronautController : ControllerBase
             EXPInSpace = astronaut.EXPInSpace,
         };
 
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 200,
-            Timestamp = DateTimeOffset.UtcNow
-        });
-        
+        LogHttpCall(200);
         return Ok(resultDto);   
     }
 
@@ -99,15 +105,16 @@ public class AstronautController : ControllerBase
         var  astronaut = await _context.Astronauts.FindAsync(id);
         if (astronaut == null)
         {
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 404,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(404);
             return NotFound();
         }
+
+        if (id != dto.AstronautId)
+        {
+            LogHttpCall(400);
+            return BadRequest("Route id and AstronautId must match.");
+        }
+
         
         astronaut.Name = dto.Name;  
         astronaut.HireDate = dto.HireDate;
@@ -118,14 +125,7 @@ public class AstronautController : ControllerBase
         
         await _context.SaveChangesAsync();
         
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 204,
-            Timestamp = DateTimeOffset.UtcNow
-        });
-        
+        LogHttpCall(204);
         return NoContent();
     }
 
@@ -135,27 +135,14 @@ public class AstronautController : ControllerBase
         var astronaut = await _context.Astronauts.FindAsync(id);
         if (astronaut == null)
         {
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 404,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(404);
             return NotFound();
         }
 
         _context.Astronauts.Remove(astronaut);
         await _context.SaveChangesAsync();
         
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 204,
-            Timestamp = DateTimeOffset.UtcNow
-        });
-        
+        LogHttpCall(204);
         return NoContent();
     }
     

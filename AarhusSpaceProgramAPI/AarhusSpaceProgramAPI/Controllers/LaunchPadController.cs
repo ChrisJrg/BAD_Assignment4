@@ -18,6 +18,17 @@ public class LaunchPadController : ControllerBase
         _context = context;
         _logger = logger;
     }
+    
+    private void LogHttpCall(int statusCode)
+    {
+        _logger.LogInformation("HTTP call {@LogInfo}", new
+        {
+            HttpMethod = HttpContext.Request.Method,
+            RequestPath = HttpContext.Request.Path.ToString(),
+            StatusCode = statusCode,
+            Timestamp = DateTimeOffset.UtcNow
+        });
+    }
 
 
     [HttpGet]
@@ -36,7 +47,7 @@ public class LaunchPadController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<LaunchPadDto>> CreateLaunchPad([FromForm] LaunchPadDto dto)
+    public async Task<ActionResult<LaunchPadDto>> CreateLaunchPad([FromBody] LaunchPadDto dto)
     {
         var launchPad = new LaunchPad
         {
@@ -55,47 +66,26 @@ public class LaunchPadController : ControllerBase
             MaxWeight = launchPad.MaxWeight,
             CurrentStatus = launchPad.CurrentStatus,
         };
-        
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 200,
-            Timestamp = DateTimeOffset.UtcNow
-        });
-        
+
+        LogHttpCall(200);
         return Ok(resultDto);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateLaunchPad(int id, [FromForm] LaunchPadDto dto)
+    public async Task<IActionResult> UpdateLaunchPad(int id, [FromBody] LaunchPadDto dto)
     {
         var  launchPad = await _context.LaunchPads.FindAsync(id);
         if (launchPad == null)
         {
-            _logger.LogInformation("HTTP call {@LogInfo}", new
-            {
-                HttpMethod = HttpContext.Request.Method,
-                RequestPath = HttpContext.Request.Path.ToString(),
-                StatusCode = 404,
-                Timestamp = DateTimeOffset.UtcNow
-            });
+            LogHttpCall(404);
             return NotFound();
         }
-        launchPad.LaunchPadId = dto.LaunchPadId;
         launchPad.Location = dto.Location;
         launchPad.MaxWeight = dto.MaxWeight;
         launchPad.CurrentStatus = dto.CurrentStatus;
         
         await _context.SaveChangesAsync();
-        
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 204,
-            Timestamp = DateTimeOffset.UtcNow
-        });
+        LogHttpCall(204);
         
         return NoContent();
     }
@@ -112,14 +102,7 @@ public class LaunchPadController : ControllerBase
         _context.LaunchPads.Remove(launchPad);
         await _context.SaveChangesAsync();
         
-        _logger.LogInformation("HTTP call {@LogInfo}", new
-        {
-            HttpMethod = HttpContext.Request.Method,
-            RequestPath = HttpContext.Request.Path.ToString(),
-            StatusCode = 204,
-            Timestamp = DateTimeOffset.UtcNow
-        });
-        
+        LogHttpCall(204);
         return NoContent();
     }
     
