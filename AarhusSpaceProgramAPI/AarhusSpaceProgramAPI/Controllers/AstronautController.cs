@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Data;
 using AarhusSpaceProgramAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AarhusSpaceProgramAPI.Controllers;
 

@@ -6,6 +6,10 @@ using AarhusSpaceProgramAPI.Data;
 using Scalar.AspNetCore;
 using AarhusSpaceProgramAPI.Models;
 using Serilog;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, config) =>
@@ -45,9 +49,61 @@ builder.Services.AddControllers(options =>
         () => $"A value is required.");
 });
 
+
+builder.Services.AddIdentity<ApiUser, IdentityRole>(options =>
+    {
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequiredLength = 5;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddAuthentication(options => {
+    options.DefaultAuthenticateScheme =
+        options.DefaultChallengeScheme =
+            options.DefaultForbidScheme =
+                options.DefaultScheme =
+                    options.DefaultSignInScheme =
+                        options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options => {
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            System.Text.Encoding.UTF8.GetBytes(
+                builder.Configuration["JWT:SigningKey"]!))
+    };
+});
+
+
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi( options => {
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Components ??= new();
+        document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+        document.Components.SecuritySchemes.Add("Bearer", new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Description = "Please enter token",
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            BearerFormat = "JWT",
+            Scheme = "bearer"
+        });
+        return Task.CompletedTask;
+    });
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
@@ -75,6 +131,7 @@ app.UseHttpsRedirection();
 
 app.UseCors();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Minimal API
@@ -119,6 +176,86 @@ app.MapControllers().RequireCors("AnyOrigin");
 using (var context = new ApplicationDbContext())
 {
     SeedDb(context);
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApiUser>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    await SeedIdentityUsers(userManager, roleManager);
+}
+
+async Task SeedIdentityUsers(
+    UserManager<ApiUser> userManager,
+    RoleManager<IdentityRole> roleManager)
+{
+    string[] roles = { "Astronaut", "Scientist", "Manager" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    await CreateUser(
+        userManager,
+        email: "manager@test.com",
+        fullName: "Manager Test",
+        password: "Test1!",
+        role: "Manager");
+
+    await CreateUser(
+        userManager,
+        email: "scientist@test.com",
+        fullName: "Scientist Test",
+        password: "Test1!",
+        role: "Scientist");
+
+    await CreateUser(
+        userManager,
+        email: "astronaut@test.com",
+        fullName: "Astronaut Test",
+        password: "Test1!",
+        role: "Astronaut");
+}
+
+async Task CreateUser(
+    UserManager<ApiUser> userManager,
+    string email,
+    string fullName,
+    string password,
+    string role)
+{
+    var existingUser = await userManager.FindByNameAsync(email);
+
+    if (existingUser != null)
+    {
+        return;
+    }
+
+    var user = new ApiUser
+    {
+        UserName = email,
+        Email = email,
+        FullName = fullName,
+        EmailConfirmed = true
+    };
+
+    var result = await userManager.CreateAsync(user, password);
+
+    if (result.Succeeded)
+    {
+        await userManager.AddToRoleAsync(user, role);
+    }
+    else
+    {
+        throw new Exception(
+            $"Could not create user {email}: " +
+            string.Join(", ", result.Errors.Select(e => e.Description)));
+    }
 }
 
 void SeedDb(ApplicationDbContext context)
