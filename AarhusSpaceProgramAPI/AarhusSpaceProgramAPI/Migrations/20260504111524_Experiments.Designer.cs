@@ -4,6 +4,7 @@ using AarhusSpaceProgramAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AarhusSpaceProgramAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260504111524_Experiments")]
+    partial class Experiments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,14 +113,9 @@ namespace AarhusSpaceProgramAPI.Migrations
                     b.Property<int?>("MissionId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ScientistId")
-                        .HasColumnType("int");
-
                     b.HasKey("ExperimentId");
 
                     b.HasIndex("MissionId");
-
-                    b.HasIndex("ScientistId");
 
                     b.ToTable("Experiment");
                 });
@@ -180,6 +178,9 @@ namespace AarhusSpaceProgramAPI.Migrations
 
                     b.Property<double>("Duration")
                         .HasColumnType("float");
+
+                    b.Property<int?>("ExperimentId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("LaunchDate")
                         .HasColumnType("datetime2");
@@ -329,13 +330,7 @@ namespace AarhusSpaceProgramAPI.Migrations
                         .WithMany("Experiments")
                         .HasForeignKey("MissionId");
 
-                    b.HasOne("AarhusSpaceProgramAPI.Models.Scientist", "Scientist")
-                        .WithMany()
-                        .HasForeignKey("ScientistId");
-
                     b.Navigation("Mission");
-
-                    b.Navigation("Scientist");
                 });
 
             modelBuilder.Entity("AarhusSpaceProgramAPI.Models.Mission", b =>

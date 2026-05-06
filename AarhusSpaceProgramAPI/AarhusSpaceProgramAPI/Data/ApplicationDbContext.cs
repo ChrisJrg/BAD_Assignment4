@@ -48,6 +48,10 @@ public class ApplicationDbContext :  DbContext
         modelBuilder.Entity<Scientist>()
             .HasMany(s =>  s.Missions)
             .WithMany(m => m.Scientists);
+
+        modelBuilder.Entity<Experiment>()
+            .HasOne(e => e.Mission)
+            .WithMany(m => m.Experiments);
         
         modelBuilder.Entity<CelestialBody>()
             .HasOne(c => c.ParentPlanet)
@@ -63,4 +67,5 @@ public class ApplicationDbContext :  DbContext
     public DbSet<Mission> Missions { get; set; }
     public DbSet<Rocket> Rockets { get; set; }
     public DbSet<Scientist> Scientists { get; set; }
+    public DbSet<Experiment> Experiment { get; set; }
 }

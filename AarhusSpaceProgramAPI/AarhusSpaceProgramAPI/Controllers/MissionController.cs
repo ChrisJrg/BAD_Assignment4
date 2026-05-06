@@ -4,6 +4,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Data;
 using AarhusSpaceProgramAPI.Models;
+using AarhusSpaceProgramAPI.Models.DTO;
 
 namespace AarhusSpaceProgramAPI.Controllers
 {
@@ -123,6 +124,19 @@ namespace AarhusSpaceProgramAPI.Controllers
                     TargetBodyName = m.TargetBody.Name
                 }).ToListAsync();
             
+            return Ok(missions);
+        }
+
+        [HttpGet("mission-experiments")]
+        public async Task<ActionResult<IEnumerable<MissionExperimentsDto>>> GetMissionExperiments()
+        {
+            var missions = await _context.Missions
+                .Select(m => new MissionExperimentsDto
+                {
+                    MissionName = m.MissionName,
+                    Experiments = m.Experiments
+                }).ToListAsync();
+
             return Ok(missions);
         }
 
