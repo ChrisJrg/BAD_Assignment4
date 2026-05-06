@@ -1,0 +1,33 @@
+﻿services:
+  aarhusspaceprogramapi:
+    image: aarhusspaceprogramapi
+    build:
+      context: .
+      dockerfile: AarhusSpaceProgramAPI/Dockerfile
+    ports:
+      - "5265:5265"
+    depends_on:
+      - mongodb
+      - sqlserver
+
+  generatemissionlogs:
+    image: generatemissionlogs
+    build:
+      context: .
+      dockerfile: GenerateMissionLogs/Dockerfile
+    depends_on:
+      - mongodb
+      - aarhusspaceprogramapi
+
+  mongodb:
+    image: mongo:8.3.1
+    ports:
+      - "27017:27017"
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: "Chris132"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"

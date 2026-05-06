@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Data;
 using Scalar.AspNetCore;
 using AarhusSpaceProgramAPI.Models;
-using AarhusSpaceProgramAPI.Services;
 using MongoDB.Driver;
 using Serilog;
 
@@ -52,18 +51,13 @@ builder.Services.AddEndpointsApiExplorer();
 var addOpenApi = builder.Services.AddOpenApi();
 
 builder.Services.AddSingleton<IMongoClient>(sp =>
-    new MongoClient("mongodb://localhost:27017"));
+    new MongoClient("mongodb://mongodb:27017"));
 
 builder.Services.AddSingleton<IMongoDatabase>(sp =>
 {
     var client = sp.GetRequiredService<IMongoClient>();
     return client.GetDatabase("SpaceProgramLogs");
 });
-
-
-builder.Services.AddHttpClient();
-
-builder.Services.AddHostedService<GenerateMissionLog>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
@@ -132,10 +126,26 @@ app.MapGet("/cod/test",
 
 app.MapControllers().RequireCors("AnyOrigin");
 
-using (var context = new ApplicationDbContext())
+var retries = 0;
+while(retries < 5)
 {
-    SeedDb(context);
+    try
+    {
+        using (var context = new ApplicationDbContext())
+        {
+            SeedDb(context);
+        }
+
+        break;
+    }
+    catch (Exception)
+    {
+        retries++;
+        Console.WriteLine($"Database not ready, retrying in 5 seconds... ({retries}/5)");
+        Thread.Sleep(5000);
+    }
 }
+
 
 void SeedDb(ApplicationDbContext context)
 {

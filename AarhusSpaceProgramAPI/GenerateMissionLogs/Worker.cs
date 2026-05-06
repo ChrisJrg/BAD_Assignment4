@@ -1,8 +1,8 @@
-
+using System.Net.Http.Json;
 using AarhusSpaceProgramAPI.Models;
 using MongoDB.Driver;
 
-namespace AarhusSpaceProgramAPI.Services;
+namespace GenerateMissionLogs.Services;
 
 public class GenerateMissionLog : BackgroundService
 {
@@ -22,7 +22,7 @@ public class GenerateMissionLog : BackgroundService
         {
             try
             {
-                var response = await client.GetAsync("http://localhost:5265/api/Mission?status=Active", stoppingToken);
+                var response = await client.GetAsync("http://aarhusspaceprogramapi/api/Mission?status=Active", stoppingToken);
                 response.EnsureSuccessStatusCode();
                 var missions = response.Content.ReadFromJsonAsync<List<MissionStatusDto>>().Result;
                 var db = _database.GetCollection<MissionLog>("MissionLog");
