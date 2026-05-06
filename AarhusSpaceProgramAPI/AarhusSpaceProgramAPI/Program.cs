@@ -74,10 +74,11 @@ builder.Services.AddAuthentication(options => {
         ValidIssuer = builder.Configuration["JWT:Issuer"],
         ValidateAudience = true,
         ValidAudience = builder.Configuration["JWT:Audience"],
+        ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
             System.Text.Encoding.UTF8.GetBytes(
-                builder.Configuration["JWT:SigningKey"]))
+                builder.Configuration["JWT:SigningKey"]!))
     };
 });
 
@@ -175,6 +176,86 @@ app.MapControllers().RequireCors("AnyOrigin");
 using (var context = new ApplicationDbContext())
 {
     SeedDb(context);
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApiUser>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    await SeedIdentityUsers(userManager, roleManager);
+}
+
+async Task SeedIdentityUsers(
+    UserManager<ApiUser> userManager,
+    RoleManager<IdentityRole> roleManager)
+{
+    string[] roles = { "Astronaut", "Scientist", "Manager" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    await CreateUser(
+        userManager,
+        email: "manager@test.com",
+        fullName: "Manager Test",
+        password: "Test1!",
+        role: "Manager");
+
+    await CreateUser(
+        userManager,
+        email: "scientist@test.com",
+        fullName: "Scientist Test",
+        password: "Test1!",
+        role: "Scientist");
+
+    await CreateUser(
+        userManager,
+        email: "astronaut@test.com",
+        fullName: "Astronaut Test",
+        password: "Test1!",
+        role: "Astronaut");
+}
+
+async Task CreateUser(
+    UserManager<ApiUser> userManager,
+    string email,
+    string fullName,
+    string password,
+    string role)
+{
+    var existingUser = await userManager.FindByNameAsync(email);
+
+    if (existingUser != null)
+    {
+        return;
+    }
+
+    var user = new ApiUser
+    {
+        UserName = email,
+        Email = email,
+        FullName = fullName,
+        EmailConfirmed = true
+    };
+
+    var result = await userManager.CreateAsync(user, password);
+
+    if (result.Succeeded)
+    {
+        await userManager.AddToRoleAsync(user, role);
+    }
+    else
+    {
+        throw new Exception(
+            $"Could not create user {email}: " +
+            string.Join(", ", result.Errors.Select(e => e.Description)));
+    }
 }
 
 void SeedDb(ApplicationDbContext context)
