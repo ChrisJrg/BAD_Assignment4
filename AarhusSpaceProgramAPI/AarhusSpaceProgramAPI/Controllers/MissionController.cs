@@ -74,11 +74,13 @@ namespace AarhusSpaceProgramAPI.Controllers
 
             var resultDto = new MissionDto
             {
+                MissionId = mission.MissionId,
                 MissionName = mission.MissionName,
                 LaunchDate = mission.LaunchDate,
                 Duration = mission.Duration,
                 Status = mission.Status,
                 Type = mission.Type,
+                RocketId = mission.RocketId
             };
             
             LogHttpCall(200);
@@ -108,6 +110,37 @@ namespace AarhusSpaceProgramAPI.Controllers
                 }).ToListAsync();
         
             
+            return Ok(mission);
+        }
+        
+        [Authorize(Roles = "Astronaut,Manager")]
+        [HttpGet("{missionId}")]
+        public async Task<ActionResult<MissionDto>> GetMissionById(int missionId)
+        {
+            var mission = await _context.Missions
+                .Where(m => m.MissionId == missionId)
+                .Select(m => new MissionDto
+                {
+                    MissionId = m.MissionId,
+                    MissionName = m.MissionName,
+                    LaunchDate = m.LaunchDate,
+                    Duration = m.Duration,
+                    Status = m.Status,
+                    Type = m.Type,
+                    RocketId = m.RocketId,
+                    LaunchPadId = m.LaunchPadId,
+                    ManagerId = m.ManagerId,
+                    TargetBodyId = m.TargetBodyId
+                })
+                .SingleOrDefaultAsync();
+
+            if (mission == null)
+            {
+                LogHttpCall(404);
+                return NotFound();
+            }
+
+            LogHttpCall(200);
             return Ok(mission);
         }
         

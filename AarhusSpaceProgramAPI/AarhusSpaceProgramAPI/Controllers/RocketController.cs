@@ -80,6 +80,7 @@ public class RocketController : ControllerBase
 
         var resultDto = new RocketDto
         {
+            RocketId = rocket.RocketId,
             Model = rocket.Model,
             Weight = rocket.Weight,
             CrewCapacity = rocket.CrewCapacity,
