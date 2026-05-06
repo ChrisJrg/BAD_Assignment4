@@ -4,6 +4,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Data;
 using AarhusSpaceProgramAPI.Models;
+using MongoDB.Driver;
 
 namespace AarhusSpaceProgramAPI.Controllers
 {
@@ -14,10 +15,12 @@ namespace AarhusSpaceProgramAPI.Controllers
         private readonly ApplicationDbContext _context;
         private string[] Statuses = ["Created", "Budgeted", "Approved", "Planned", "Active", "Completed", "Aborted", "Failed"];
         private readonly ILogger<MissionController> _logger;
-        public MissionController(ApplicationDbContext context, ILogger<MissionController> logger)
+        private readonly IMongoClient _database;
+        public MissionController(ApplicationDbContext context, ILogger<MissionController> logger, IMongoClient database)
         {
             _context = context;
             _logger = logger;
+            _database = database;
         }
         
         private void LogHttpCall(int statusCode)
@@ -83,27 +86,6 @@ namespace AarhusSpaceProgramAPI.Controllers
             return Ok(resultDto);
         }
         
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<MissionDto>>> GetMissions()
-        {
-            var mission = await _context.Missions
-                .Select(m => new MissionDto
-                {
-                    MissionId =  m.MissionId,
-                    MissionName = m.MissionName,
-                    LaunchDate = m.LaunchDate,
-                    Duration =  m.Duration,
-                    Status =  m.Status,
-                    Type = m.Type,
-                    RocketId = m.RocketId,
-                    LaunchPadId = m.LaunchPadId,
-                    ManagerId = m.ManagerId,
-                    TargetBodyId = m.TargetBodyId
-                }).ToListAsync();
-        
-            
-            return Ok(mission);
-        }
         
         [HttpGet("mission-overview")]
         public async Task<ActionResult<IEnumerable<MissionOverviewDto>>> GetMissionOverview()
@@ -124,6 +106,39 @@ namespace AarhusSpaceProgramAPI.Controllers
                 }).ToListAsync();
             
             return Ok(missions);
+        }
+        
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<MissionStatusDto>>> GetMissions([FromQuery] string? status)
+        {
+            var query = _context.Missions.AsQueryable();
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(m => m.Status == status);
+
+            return Ok(await query.Select(m => new MissionDto
+            {
+                MissionId = m.MissionId,
+                MissionName = m.MissionName,
+                LaunchDate = m.LaunchDate,
+                Duration = m.Duration,
+                Status = m.Status,
+                Type = m.Type,
+                RocketId = m.RocketId,
+                LaunchPadId = m.LaunchPadId,
+                ManagerId = m.ManagerId,
+                TargetBodyId = m.TargetBodyId,
+            }).ToListAsync());
+        }
+
+        [HttpGet("{MissionId}/Logs")]
+        public async Task<ActionResult> GetMissionLogs(int MissionId)
+        {
+            var db = _database.GetDatabase("SpaceProgramLogs");
+            var collection = db.GetCollection<MissionLog>("MissionLog");
+            var missionLogs = await collection.Find(m => m.MissionId == MissionId.ToString()).ToListAsync();
+            
+            return Ok(missionLogs);
         }
 
         [HttpDelete("{missionId}")]

@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Data;
 using Scalar.AspNetCore;
 using AarhusSpaceProgramAPI.Models;
+using AarhusSpaceProgramAPI.Services;
+using MongoDB.Driver;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,7 +49,20 @@ builder.Services.AddControllers(options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApi();
+var addOpenApi = builder.Services.AddOpenApi();
+builder.Services.AddHostedService<GenerateMissionLog>();
+
+builder.Services.AddSingleton<IMongoClient>(sp =>
+    new MongoClient("mongodb://localhost:27017"));
+
+builder.Services.AddSingleton<IMongoDatabase>(sp =>
+{
+    var client = sp.GetRequiredService<IMongoClient>();
+    return client.GetDatabase("SpaceProgramLogs");
+});
+
+
+builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
@@ -216,4 +231,15 @@ void SeedDb(ApplicationDbContext context)
         context.SaveChanges();
 }
 
-app.Run();
+try
+{
+
+    app.Run();
+
+}
+catch(Exception ex)
+{
+    Console.WriteLine($"Fatal error: {ex.Message}");
+    Console.WriteLine(ex.StackTrace);
+    Console.ReadLine();
+}
