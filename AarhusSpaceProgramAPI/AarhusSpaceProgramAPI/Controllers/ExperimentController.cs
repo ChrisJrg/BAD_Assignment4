@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using AarhusSpaceProgramAPI.Models;
 using AarhusSpaceProgramAPI.Models.DTO;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace AarhusSpaceProgramAPI.Controllers;
 
@@ -16,7 +18,8 @@ public class ExperimentController : ControllerBase
     {
         _context = context;
     }
-
+    
+    [Authorize(Roles = "Scientist,Manager")]
     [HttpPost]
     public async Task<ActionResult<ExperimentwdDto>> CreateExperiment([FromForm] ExperimentwdDto dto)
     {
@@ -42,6 +45,7 @@ public class ExperimentController : ControllerBase
         return Ok(resultDto);
     }
 
+    [Authorize(Roles = "Astronaut,Scientist,Manager")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ExperimentDto>>> GetExperiments()
     {
@@ -58,6 +62,7 @@ public class ExperimentController : ControllerBase
         return Ok(experiments);
     }
 
+    [Authorize(Roles = "Scientist,Manager")]
     [HttpPut("{id}")]
     public async Task<ActionResult<ExperimentDto>> UpdateExperiment(int id, [FromBody] ExperimentDto dto)
     {
@@ -81,7 +86,9 @@ public class ExperimentController : ControllerBase
         
         return NoContent();
     }
-
+    
+    
+    [Authorize(Roles = "Scientist,Manager")]
     [HttpDelete("{id}")]
     public async Task<ActionResult<ExperimentDto>> DeleteExperiment(int id)
     {
