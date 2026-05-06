@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 namespace AarhusSpaceProgramAPI.Data;
 
-public class ApplicationDbContext :  DbContext
+public class ApplicationDbContext : IdentityDbContext<ApiUser>
 {
     public ApplicationDbContext(){}
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
