@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Data;
 using  AarhusSpaceProgramAPI.Models;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace AarhusSpaceProgramAPI.Controllers;
 
@@ -31,6 +33,7 @@ public class RocketController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Astronaut,Manager")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RocketDto>>> GetRocket()
     {
@@ -50,6 +53,8 @@ public class RocketController : ControllerBase
         return Ok(rockets);
     }
 
+    
+    [Authorize(Roles = "Manager")]
     [HttpPost]
     public async Task<ActionResult<RocketDto>> CreateRocket([FromBody]RocketDto dto)
     {
@@ -88,6 +93,8 @@ public class RocketController : ControllerBase
         return Ok(resultDto);
     }
 
+    
+    [Authorize(Roles = "Manager")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateRocket(int id, [FromBody]RocketDto dto)
     {
@@ -119,6 +126,8 @@ public class RocketController : ControllerBase
         return NoContent();
     }
 
+    
+    [Authorize(Roles = "Manager")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteRocket(int id)
     {

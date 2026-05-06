@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Data;
 using AarhusSpaceProgramAPI.Models;
 using AarhusSpaceProgramAPI.Models.DTO;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace AarhusSpaceProgramAPI.Controllers
 {
@@ -32,6 +34,7 @@ namespace AarhusSpaceProgramAPI.Controllers
             });
         }
 
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public async Task<ActionResult<MissionDto>> CreateMission([FromBody] MissionDto missionDto)
         {
@@ -84,6 +87,8 @@ namespace AarhusSpaceProgramAPI.Controllers
             return Ok(resultDto);
         }
         
+        
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MissionDto>>> GetMissions()
         {
@@ -106,6 +111,8 @@ namespace AarhusSpaceProgramAPI.Controllers
             return Ok(mission);
         }
         
+        
+        [Authorize(Roles = "Astronaut,Manager")]
         [HttpGet("mission-overview")]
         public async Task<ActionResult<IEnumerable<MissionOverviewDto>>> GetMissionOverview()
         {
@@ -127,6 +134,7 @@ namespace AarhusSpaceProgramAPI.Controllers
             return Ok(missions);
         }
 
+        [Authorize(Roles = "Astronaut,Manager")]
         [HttpGet("mission-experiments")]
         public async Task<ActionResult<IEnumerable<MissionExperimentsDto>>> GetMissionExperiments()
         {
@@ -140,6 +148,8 @@ namespace AarhusSpaceProgramAPI.Controllers
             return Ok(missions);
         }
 
+        
+        [Authorize(Roles = "Manager")]
         [HttpDelete("{missionId}")]
         public async Task<IActionResult> DeleteMission(int missionId)
         {
@@ -160,6 +170,7 @@ namespace AarhusSpaceProgramAPI.Controllers
             return NoContent();
         }
         
+        [Authorize(Roles = "Manager")]
         [HttpPut("AssignAstronaut/{astronautId}")]
         public async Task<IActionResult> UpdateMissionAssignAstronaut(int missionId, int astronautId)
         {
@@ -194,6 +205,8 @@ namespace AarhusSpaceProgramAPI.Controllers
             return Ok(mission);
         }
         
+        
+        [Authorize(Roles = "Manager")]
         [HttpPut("RemoveAstronaut/{astronautId}")]
         public async Task<IActionResult> UpdateMissionRemoveAstronaut(int missionId, int astronautId)
         {
@@ -227,6 +240,7 @@ namespace AarhusSpaceProgramAPI.Controllers
             return NoContent();
         }
         
+        [Authorize(Roles = "Manager")]
         [HttpPut("AssignScientist/{scientistId}")]
         public async Task<IActionResult> UpdateMissionAssignScientist(int missionId, int scientistId)
         {
@@ -257,6 +271,7 @@ namespace AarhusSpaceProgramAPI.Controllers
             return NoContent();
         }
         
+        [Authorize(Roles = "Manager")]
         [HttpPut("RemoveScientist/{scientistId}")]
         public async Task<IActionResult> UpdateMissionRemoveScientist(int missionId, int scientistId)
         {
@@ -288,6 +303,7 @@ namespace AarhusSpaceProgramAPI.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Manager")]
         [HttpPut("StatusUpdate/{missionId}")]
         public async Task<IActionResult> UpdateMissionStatus(string status, int missionId)
         {
@@ -316,6 +332,7 @@ namespace AarhusSpaceProgramAPI.Controllers
             return Ok(mission);
         }
         
+        [Authorize(Roles = "Manager")]
         [HttpPut("UpdateMission/{missionId}")]
         public async Task<IActionResult> UpdateMission(int missionId, [FromBody] MissionDto missionDto)
         {
@@ -353,6 +370,8 @@ namespace AarhusSpaceProgramAPI.Controllers
             return NoContent();
         }
         
+        
+        [Authorize(Roles = "Astronaut,Manager")]
         [HttpGet("AssignedToMission/{missionId}")]
         public async Task<IActionResult> AssignedToMissions(int missionId)
         {
@@ -368,6 +387,7 @@ namespace AarhusSpaceProgramAPI.Controllers
             return Ok(mission);
         }
         
+        [Authorize(Roles = "Astronaut,Manager")]
         [HttpGet("MissionsAtTargetBody/{planetId}")]
         public async Task<IActionResult> MissionsAtTargetBody(int planetId)
         {

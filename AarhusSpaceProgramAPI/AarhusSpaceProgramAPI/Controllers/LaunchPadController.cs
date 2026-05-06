@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Data;
 using  AarhusSpaceProgramAPI.Models;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace AarhusSpaceProgramAPI.Controllers;
 
@@ -31,6 +33,7 @@ public class LaunchPadController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Astronaut,Manager")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<LaunchPadDto>>> GetLaunchPads()
     {
@@ -46,6 +49,7 @@ public class LaunchPadController : ControllerBase
         return Ok(launchPad);
     }
 
+    [Authorize(Roles = "Manager")]
     [HttpPost]
     public async Task<ActionResult<LaunchPadDto>> CreateLaunchPad([FromBody] LaunchPadDto dto)
     {
@@ -70,7 +74,8 @@ public class LaunchPadController : ControllerBase
         LogHttpCall(200);
         return Ok(resultDto);
     }
-
+    
+    [Authorize(Roles = "Manager")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateLaunchPad(int id, [FromBody] LaunchPadDto dto)
     {
@@ -90,6 +95,7 @@ public class LaunchPadController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Roles = "Manager")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteLaunchPad(int id)
     {

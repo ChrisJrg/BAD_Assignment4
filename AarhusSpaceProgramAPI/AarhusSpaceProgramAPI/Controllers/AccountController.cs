@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace AarhusSpaceProgramAPI.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class AccountController : ControllerBase
 {
     private readonly IConfiguration _configuration;
@@ -23,8 +23,7 @@ public class AccountController : ControllerBase
         _userManager = userManager;
     }
 
-[HttpPost]
-[Route("Login")] 
+[HttpPost("Login")]
 public async Task<ActionResult> Login(LoginDto input)
 {
     try
@@ -81,12 +80,7 @@ public async Task<ActionResult> Login(LoginDto input)
 
         var jwtString = new JwtSecurityTokenHandler().WriteToken(jwtObject);
 
-        return Ok(new
-        {
-            token = jwtString,
-            userName = user.UserName,
-            roles = userRoles
-        });
+       return StatusCode(StatusCodes.Status200OK, jwtString);
     }
     catch (Exception e)
     {
