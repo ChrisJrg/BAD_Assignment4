@@ -50,7 +50,6 @@ builder.Services.AddControllers(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 var addOpenApi = builder.Services.AddOpenApi();
-builder.Services.AddHostedService<GenerateMissionLog>();
 
 builder.Services.AddSingleton<IMongoClient>(sp =>
     new MongoClient("mongodb://localhost:27017"));
@@ -63,6 +62,8 @@ builder.Services.AddSingleton<IMongoDatabase>(sp =>
 
 
 builder.Services.AddHttpClient();
+
+builder.Services.AddHostedService<GenerateMissionLog>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
