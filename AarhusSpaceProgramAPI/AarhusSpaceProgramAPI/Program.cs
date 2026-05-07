@@ -188,7 +188,7 @@ void SeedDb(ApplicationDbContext context)
             MissionName = "Mars Exploration",
             LaunchDate = DateTime.Now.AddYears(+2),
             Duration = 175,
-            Status = "Under Correction",
+            Status = "Active",
             Type = "Observation",
             Rocket = rocket1,
             LaunchPad = pad2,

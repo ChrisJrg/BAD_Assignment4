@@ -9,7 +9,7 @@
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
       ASPNETCORE_URLS: "http://+:5265"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=SpaceDB2;User Id=sa;Password=Chris132;TrustServerCertificate=True"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=SpaceDB2;User Id=SA;Password=Chris132;TrustServerCertificate=True"
     depends_on:
       mongodb: 
         condition: service_started
@@ -39,7 +39,7 @@
     ports:
       - "1433:1433"
     healthcheck:
-      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Chris132!" -Q "SELECT 1" -b -o /dev/null -C
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Chris132" -Q "SELECT 1" -b -o /dev/null -C
       interval: 10s
       timeout: 10s
       retries: 10
