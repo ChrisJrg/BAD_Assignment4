@@ -1,3 +1,11 @@
+| Student                     | StudentNumber |
+|-----------------------------|---------------|
+| Mikkel Kristiansen          | 202301563     |
+| Christopher Frank Jørgensen | 202300791     |
+
+
+
+
 Base URL: http://localhost:5265  
 Scalar UI URL: http://localhost:5265/Scalar  
 Openapi URL: http://localhost:5265/openapi/v1.json
