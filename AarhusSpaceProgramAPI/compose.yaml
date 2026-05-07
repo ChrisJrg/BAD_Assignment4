@@ -7,8 +7,11 @@
     ports:
       - "5265:5265"
     depends_on:
-      - mongodb
-      - sqlserver
+      mongodb: 
+        condition: service_started
+      sqlserver:
+        condition: service_healthy
+          
 
   generatemissionlogs:
     image: generatemissionlogs
@@ -31,3 +34,9 @@
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Chris132!" -Q "SELECT 1" -b -o /dev/null -C
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s

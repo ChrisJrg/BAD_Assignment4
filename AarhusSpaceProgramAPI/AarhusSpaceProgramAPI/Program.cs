@@ -127,7 +127,7 @@ app.MapGet("/cod/test",
 app.MapControllers().RequireCors("AnyOrigin");
 
 var retries = 0;
-while(retries < 5)
+while(retries < 10)
 {
     try
     {
@@ -138,10 +138,10 @@ while(retries < 5)
 
         break;
     }
-    catch (Exception)
+    catch (Exception ex)
     {
         retries++;
-        Console.WriteLine($"Database not ready, retrying in 5 seconds... ({retries}/5)");
+        Console.WriteLine($"Database not ready {ex.Message}, retrying in 5 seconds... ({retries}/5)");
         Thread.Sleep(5000);
     }
 }
