@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Data;
 using AarhusSpaceProgramAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AarhusSpaceProgramAPI.Controllers;
 
@@ -31,7 +32,7 @@ public class AstronautController : ControllerBase
     }
     
 
-
+    [Authorize(Roles = "Astronaut,Manager")]
     [HttpGet("space-experience")]
     public async Task<ActionResult<IEnumerable<AstronautExperienceDto>>> GetAstronautsBySpaceExperience()
     {
@@ -49,6 +50,7 @@ public class AstronautController : ControllerBase
     }
 
 
+    [Authorize(Roles = "Astronaut,Manager")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AstronautDto>>> GetAstronauts()
     {
@@ -67,6 +69,7 @@ public class AstronautController : ControllerBase
         return Ok(astronauts);
     }
 
+    [Authorize(Roles = "Manager")]
     [HttpPost]
     public async Task<ActionResult<AstronautDto>> CreateAstronaut([FromBody] AstronautDto dto)
     {
@@ -98,7 +101,9 @@ public class AstronautController : ControllerBase
         LogHttpCall(200);
         return Ok(resultDto);   
     }
-
+    
+    
+    [Authorize(Roles = "Manager")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateAstronaut(int id, [FromBody] AstronautDto dto)
     {
@@ -129,6 +134,7 @@ public class AstronautController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Roles = "Manager")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAstronaut(int id)
     {

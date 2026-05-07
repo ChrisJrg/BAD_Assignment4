@@ -4,6 +4,7 @@ using AarhusSpaceProgramAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AarhusSpaceProgramAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260506080453_identity")]
+    partial class identity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,6 +45,7 @@ namespace AarhusSpaceProgramAPI.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FullName")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -155,40 +159,6 @@ namespace AarhusSpaceProgramAPI.Migrations
                     b.HasIndex("ParentPlanetId");
 
                     b.ToTable("CelestialBodies");
-                });
-
-            modelBuilder.Entity("AarhusSpaceProgramAPI.Models.Experiment", b =>
-                {
-                    b.Property<int>("ExperimentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ExperimentId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExperimentName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("MissionId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ScientistId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ExperimentId");
-
-                    b.HasIndex("MissionId");
-
-                    b.HasIndex("ScientistId");
-
-                    b.ToTable("Experiment");
                 });
 
             modelBuilder.Entity("AarhusSpaceProgramAPI.Models.LaunchPad", b =>
@@ -525,21 +495,6 @@ namespace AarhusSpaceProgramAPI.Migrations
                     b.Navigation("ParentPlanet");
                 });
 
-            modelBuilder.Entity("AarhusSpaceProgramAPI.Models.Experiment", b =>
-                {
-                    b.HasOne("AarhusSpaceProgramAPI.Models.Mission", "Mission")
-                        .WithMany("Experiments")
-                        .HasForeignKey("MissionId");
-
-                    b.HasOne("AarhusSpaceProgramAPI.Models.Scientist", "Scientist")
-                        .WithMany()
-                        .HasForeignKey("ScientistId");
-
-                    b.Navigation("Mission");
-
-                    b.Navigation("Scientist");
-                });
-
             modelBuilder.Entity("AarhusSpaceProgramAPI.Models.Mission", b =>
                 {
                     b.HasOne("AarhusSpaceProgramAPI.Models.LaunchPad", "LaunchPad")
@@ -663,11 +618,6 @@ namespace AarhusSpaceProgramAPI.Migrations
             modelBuilder.Entity("AarhusSpaceProgramAPI.Models.Manager", b =>
                 {
                     b.Navigation("Missions");
-                });
-
-            modelBuilder.Entity("AarhusSpaceProgramAPI.Models.Mission", b =>
-                {
-                    b.Navigation("Experiments");
                 });
 
             modelBuilder.Entity("AarhusSpaceProgramAPI.Models.Rocket", b =>
