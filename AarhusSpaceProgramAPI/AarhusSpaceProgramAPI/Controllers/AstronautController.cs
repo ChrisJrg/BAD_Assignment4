@@ -32,7 +32,7 @@ public class AstronautController : ControllerBase
     }
     
 
-    [Authorize(Roles = "Astronaut,Manager")]
+    [Authorize(Policy = "GETOnly")]
     [HttpGet("space-experience")]
     public async Task<ActionResult<IEnumerable<AstronautExperienceDto>>> GetAstronautsBySpaceExperience()
     {
@@ -50,7 +50,7 @@ public class AstronautController : ControllerBase
     }
 
 
-    [Authorize(Roles = "Astronaut,Manager")]
+    [Authorize(Policy = "GETOnly")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AstronautDto>>> GetAstronauts()
     {
@@ -69,7 +69,7 @@ public class AstronautController : ControllerBase
         return Ok(astronauts);
     }
 
-    [Authorize(Roles = "Manager")]
+    [Authorize(Policy = "FullAccess")]
     [HttpPost]
     public async Task<ActionResult<AstronautDto>> CreateAstronaut([FromBody] AstronautDto dto)
     {
@@ -103,7 +103,7 @@ public class AstronautController : ControllerBase
     }
     
     
-    [Authorize(Roles = "Manager")]
+    [Authorize(Policy = "FullAccess")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateAstronaut(int id, [FromBody] AstronautDto dto)
     {
@@ -134,7 +134,7 @@ public class AstronautController : ControllerBase
         return NoContent();
     }
 
-    [Authorize(Roles = "Manager")]
+    [Authorize(Policy = "FullAccess")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAstronaut(int id)
     {

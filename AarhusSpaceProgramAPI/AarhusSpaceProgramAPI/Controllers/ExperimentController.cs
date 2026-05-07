@@ -19,7 +19,7 @@ public class ExperimentController : ControllerBase
         _context = context;
     }
     
-    [Authorize(Roles = "Scientist,Manager")]
+    [Authorize(Policy = "ExperimentCrud")]
     [HttpPost]
     public async Task<ActionResult<ExperimentwdDto>> CreateExperiment([FromForm] ExperimentwdDto dto)
     {
