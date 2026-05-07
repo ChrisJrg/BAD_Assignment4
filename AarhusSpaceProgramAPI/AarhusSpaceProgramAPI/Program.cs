@@ -97,6 +97,7 @@ builder.Services.AddSingleton<IMongoDatabase>(sp =>
 {
     var client = sp.GetRequiredService<IMongoClient>();
     return client.GetDatabase("SpaceProgramLogs");
+});
 builder.Services.AddOpenApi( options => {
     options.AddDocumentTransformer((document, context, cancellationToken) =>
     {
