@@ -22,9 +22,9 @@ public class GenerateMissionLog : BackgroundService
         {
             try
             {
-                var response = await client.GetAsync("http://aarhusspaceprogramapi/api/Mission?status=Active", stoppingToken);
+                var response = await client.GetAsync("http://aarhusspaceprogramapi:5265/api/Mission?status=Active", stoppingToken);
                 response.EnsureSuccessStatusCode();
-                var missions = response.Content.ReadFromJsonAsync<List<MissionStatusDto>>().Result;
+                var missions = await response.Content.ReadFromJsonAsync<List<MissionStatusDto>>(stoppingToken);
                 var db = _database.GetCollection<MissionLog>("MissionLog");
                 foreach (var mission in missions)
                 {
@@ -37,12 +37,12 @@ public class GenerateMissionLog : BackgroundService
                     await db.InsertOneAsync(log);
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
+            await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
         }
     }
 }
