@@ -93,7 +93,6 @@ namespace AarhusSpaceProgramAPI.Controllers
         }
         
         
-        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MissionDto>>> GetMissions()
         {
@@ -170,6 +169,8 @@ namespace AarhusSpaceProgramAPI.Controllers
             return Ok(missions);
         }
         
+        
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MissionStatusDto>>> GetMissions([FromQuery] string? status)
         {
