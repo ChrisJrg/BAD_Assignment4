@@ -6,6 +6,10 @@
       dockerfile: AarhusSpaceProgramAPI/Dockerfile
     ports:
       - "5265:5265"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_URLS: "http://+:5265"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=SpaceDB2;User Id=sa;Password=Chris132;TrustServerCertificate=True"
     depends_on:
       - mongodb
       - sqlserver

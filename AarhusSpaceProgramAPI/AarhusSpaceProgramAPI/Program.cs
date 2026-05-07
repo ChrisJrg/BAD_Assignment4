@@ -127,21 +127,24 @@ app.MapGet("/cod/test",
 app.MapControllers().RequireCors("AnyOrigin");
 
 var retries = 0;
-while(retries < 5)
+while (retries < 20)
 {
     try
     {
-        using (var context = new ApplicationDbContext())
-        {
-            SeedDb(context);
-        }
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
+        context.Database.Migrate();
+        SeedDb(context);
+
+        Console.WriteLine("Database ready and seeded.");
         break;
     }
-    catch (Exception)
+    catch (Exception ex)
     {
         retries++;
-        Console.WriteLine($"Database not ready, retrying in 5 seconds... ({retries}/5)");
+        Console.WriteLine($"Database not ready, retrying in 5 seconds... ({retries}/20)");
+        Console.WriteLine(ex.Message);
         Thread.Sleep(5000);
     }
 }
