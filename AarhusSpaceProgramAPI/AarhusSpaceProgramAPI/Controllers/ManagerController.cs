@@ -33,7 +33,7 @@ public class ManagerController : ControllerBase
     }
 
 
-    [Authorize(Roles = "Astronaut,Manager")]
+    [Authorize(Policy = "GETOnly")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ManagerDto>>> GetManagers()
     {
@@ -49,7 +49,7 @@ public class ManagerController : ControllerBase
         return Ok(manager);
     }
 
-    [Authorize(Roles = "Manager")]
+    [Authorize(Policy = "FullAccess")]
     [HttpPost]
     public async Task<ActionResult<ManagerDto>> CreateManager([FromForm] ManagerDto dto)
     {
@@ -75,7 +75,7 @@ public class ManagerController : ControllerBase
         return Ok(resultDto);
     }
 
-    [Authorize(Roles = "Manager")]
+    [Authorize(Policy = "FullAccess")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateManager(int id, [FromForm] ManagerDto dto)
     {
@@ -95,7 +95,7 @@ public class ManagerController : ControllerBase
         return NoContent();
     }
 
-    [Authorize(Roles = "Manager")]
+    [Authorize(Policy = "FullAccess")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteManager(int id)
     {

@@ -33,7 +33,7 @@ public class ScientistController : ControllerBase
     }
 
 
-    [Authorize(Roles = "Astronaut,Manager")]
+    [Authorize(Policy = "GETOnly")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ScientistDto>>> GetScientists()
     {
@@ -51,7 +51,7 @@ public class ScientistController : ControllerBase
         return Ok(scientists);
     }
 
-    [Authorize(Roles = "Manager")]
+    [Authorize(Policy = "FullAccess")]
     [HttpPost]
     public async Task<ActionResult<ScientistDto>> CreateScientist([FromForm]ScientistDto dto)
     {
@@ -83,7 +83,7 @@ public class ScientistController : ControllerBase
     }
 
     
-    [Authorize(Roles = "Manager")]
+    [Authorize(Policy = "FullAccess")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateScientist(int id, [FromForm]ScientistDto dto)
     {
@@ -109,7 +109,7 @@ public class ScientistController : ControllerBase
     }
 
     
-    [Authorize(Roles = "Manager")]
+    [Authorize(Policy = "FullAccess")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteScientist(int id)
     {

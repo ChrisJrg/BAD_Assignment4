@@ -33,7 +33,7 @@ public class LaunchPadController : ControllerBase
     }
 
 
-    [Authorize(Roles = "Astronaut,Manager")]
+    [Authorize(Policy = "GETOnly")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<LaunchPadDto>>> GetLaunchPads()
     {
@@ -49,7 +49,7 @@ public class LaunchPadController : ControllerBase
         return Ok(launchPad);
     }
 
-    [Authorize(Roles = "Manager")]
+    [Authorize(Policy = "FullAccess")]
     [HttpPost]
     public async Task<ActionResult<LaunchPadDto>> CreateLaunchPad([FromBody] LaunchPadDto dto)
     {
@@ -75,7 +75,7 @@ public class LaunchPadController : ControllerBase
         return Ok(resultDto);
     }
     
-    [Authorize(Roles = "Manager")]
+    [Authorize(Policy = "FullAccess")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateLaunchPad(int id, [FromBody] LaunchPadDto dto)
     {
@@ -95,7 +95,7 @@ public class LaunchPadController : ControllerBase
         return NoContent();
     }
 
-    [Authorize(Roles = "Manager")]
+    [Authorize(Policy = "FullAccess")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteLaunchPad(int id)
     {

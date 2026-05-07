@@ -45,7 +45,7 @@ public class ExperimentController : ControllerBase
         return Ok(resultDto);
     }
 
-    [Authorize(Roles = "Astronaut,Scientist,Manager")]
+    [Authorize(Policy = "GETOnly")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ExperimentDto>>> GetExperiments()
     {
@@ -62,7 +62,7 @@ public class ExperimentController : ControllerBase
         return Ok(experiments);
     }
 
-    [Authorize(Roles = "Scientist,Manager")]
+    [Authorize(Policy = "ExperimentCrud")]
     [HttpPut("{id}")]
     public async Task<ActionResult<ExperimentDto>> UpdateExperiment(int id, [FromBody] ExperimentDto dto)
     {
@@ -88,7 +88,7 @@ public class ExperimentController : ControllerBase
     }
     
     
-    [Authorize(Roles = "Scientist,Manager")]
+    [Authorize(Policy = "ExperimentCrud")]
     [HttpDelete("{id}")]
     public async Task<ActionResult<ExperimentDto>> DeleteExperiment(int id)
     {
