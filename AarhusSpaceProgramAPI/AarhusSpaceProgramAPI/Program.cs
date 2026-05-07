@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using AarhusSpaceProgramAPI.Data;
 using Scalar.AspNetCore;
 using AarhusSpaceProgramAPI.Models;
+using MongoDB.Driver;
 using Serilog;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -87,6 +88,15 @@ builder.Services.AddAuthentication(options => {
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+var addOpenApi = builder.Services.AddOpenApi();
+
+builder.Services.AddSingleton<IMongoClient>(sp =>
+    new MongoClient("mongodb://mongodb:27017"));
+
+builder.Services.AddSingleton<IMongoDatabase>(sp =>
+{
+    var client = sp.GetRequiredService<IMongoClient>();
+    return client.GetDatabase("SpaceProgramLogs");
 builder.Services.AddOpenApi( options => {
     options.AddDocumentTransformer((document, context, cancellationToken) =>
     {
@@ -173,9 +183,27 @@ app.MapGet("/cod/test",
 
 app.MapControllers().RequireCors("AnyOrigin");
 
-using (var context = new ApplicationDbContext())
+var retries = 0;
+while (retries < 20)
 {
-    SeedDb(context);
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        context.Database.Migrate();
+        SeedDb(context);
+
+        Console.WriteLine("Database ready and seeded.");
+        break;
+    }
+    catch (Exception ex)
+    {
+        retries++;
+        Console.WriteLine($"Database not ready, retrying in 5 seconds... ({retries}/20)");
+        Console.WriteLine(ex.Message);
+        Thread.Sleep(5000);
+    }
 }
 
 using (var scope = app.Services.CreateScope())
@@ -296,7 +324,7 @@ void SeedDb(ApplicationDbContext context)
             MissionName = "Mars Exploration",
             LaunchDate = DateTime.Now.AddYears(+2),
             Duration = 175,
-            Status = "Under Correction",
+            Status = "Active",
             Type = "Observation",
             Rocket = rocket1,
             LaunchPad = pad2,
@@ -353,4 +381,15 @@ void SeedDb(ApplicationDbContext context)
         context.SaveChanges();
 }
 
-app.Run();
+try
+{
+
+    app.Run();
+
+}
+catch(Exception ex)
+{
+    Console.WriteLine($"Fatal error: {ex.Message}");
+    Console.WriteLine(ex.StackTrace);
+    Console.ReadLine();
+}

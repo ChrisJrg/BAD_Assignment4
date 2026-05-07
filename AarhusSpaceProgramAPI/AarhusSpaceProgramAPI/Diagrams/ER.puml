@@ -58,6 +58,13 @@ entity Celestial_body{
     bodyType
 }
 
+entity Experiment{
+    ExperiemntId <<key>>
+    ExperimentName
+    Description
+    CreatedAt
+}
+
 
 relationship Launch_from{
 }
@@ -72,6 +79,10 @@ relationship Participate{
 relationship Target{
 }
 relationship Orbiting{
+}
+relationship Assigned_experiment{
+}
+relationship Belongs_to{
 }
 
 
@@ -97,6 +108,11 @@ Target -1- Celestial_body
 Celestial_body -N- Orbiting
 Orbiting -1- Celestial_body
 
+Scientist -1- Assigned_experiment
+Assigned_experiment -N- Experiment
+
+Experiment -N- Belongs_to
+Belongs_to -1- Mission
 
 
 

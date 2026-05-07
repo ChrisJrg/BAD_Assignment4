@@ -16,7 +16,7 @@ public class ApplicationDbContext : IdentityDbContext<ApiUser>
         if (options.IsConfigured) return;
 
         var configuration = new ConfigurationBuilder()
-            .AddUserSecrets<ApplicationDbContext>()
+            .AddJsonFile("appsettings.json")
             .Build();
 
         string? connectionString = configuration["ConnectionStrings:DefaultConnection"];
