@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, config) =>
 {
@@ -80,6 +82,13 @@ builder.Services.AddAuthentication(options => {
             System.Text.Encoding.UTF8.GetBytes(
                 builder.Configuration["JWT:SigningKey"]!))
     };
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ExperimentCrud", policy => policy.RequireRole("Scientist", "Manager","true"));
+    options.AddPolicy("GETOnly", policy => policy.RequireRole("Astronaut", "Manger","true"));
+    options.AddPolicy("FullAccess", policy => policy.RequireRole("Manager","true"));
 });
 
 
