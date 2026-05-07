@@ -85,9 +85,9 @@ builder.Services.AddAuthentication(options => {
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("ExperimentCrud", policy => policy.RequireRole("Scientist", "Manager","true"));
-    options.AddPolicy("GETOnly", policy => policy.RequireRole("Astronaut", "Manger", "Scientist","true"));
-    options.AddPolicy("FullAccess", policy => policy.RequireRole("Manager","true"));
+    options.AddPolicy("ExperimentCrud", policy => policy.RequireRole("Scientist", "Manager"));
+    options.AddPolicy("GETOnly", policy => policy.RequireRole("Astronaut", "Manager", "Scientist"));
+    options.AddPolicy("FullAccess", policy => policy.RequireRole("Manager"));
 });
 
 
